@@ -5,7 +5,7 @@ window.io = io;
 
 const echo = new Echo({
   broadcaster: "socket.io",
-  host: "http://localhost:6001",
+  host: "ws://localhost:8080/chat",
 });
 
 export default echo;
