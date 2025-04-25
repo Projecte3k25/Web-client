@@ -6,7 +6,7 @@ const Chat = () => {
   const ws = useRef(null);
 
   useEffect(() => {
-    // Conexión al WebSocket de Ratchet
+    // Conexión al WebSocket de Ratchet ip luego 10.225.0.240
     ws.current = new WebSocket("ws://localhost:8080/chat");
 
     ws.current.onopen = () => {

@@ -7,16 +7,19 @@ import Home from "./pages/Home.jsx";
 import Lobby from "./pages/Lobby.jsx";
 import GameBoard from "./pages/GameBoard.jsx";
 import "./index.css";
+import { WebSocketProvider } from "./context/WebSocketContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/lobby" element={<Lobby />} />
-        <Route path="/game" element={<GameBoard />} />
-      </Routes>
-    </BrowserRouter>
+    <WebSocketProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/lobby" element={<Lobby />} />
+          <Route path="/game" element={<GameBoard />} />
+        </Routes>
+      </BrowserRouter>
+    </WebSocketProvider>
   </React.StrictMode>
 );

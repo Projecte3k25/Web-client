@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <h1 class="text-3xl font-bold underline">Risk Web</h1>
-      <Lobby />
+      {/* <Lobby /> */}
       {/* <Chat></Chat> */}
     </>
   );
