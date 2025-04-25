@@ -17,7 +17,7 @@ const Lobby = () => {
 
       <div className="flex flex-grow h-[500px] w-full bg-gray-800 rounded-lg overflow-hidden shadow-lg">
         <div className="w-2/3 p-6 border-r border-gray-700">
-          <PlayerList />
+          {/* <PlayerList /> */}
         </div>
 
         <div className="w-1/3 pr-10 pl-10 h-[500px] overflow-y-hidden">

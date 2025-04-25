@@ -9,7 +9,7 @@ const PlayerList = () => {
     WebSocketService.onMessage((event) => {
       const data = JSON.parse(event.data);
 
-      if (data.type === "playerJoined") {
+      if (data.method === "playerJoined") {
         setPlayers((prevPlayers) => [...prevPlayers, data.player]);
       }
     });
