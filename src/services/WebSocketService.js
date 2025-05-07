@@ -1,4 +1,3 @@
-// WebSocketService.js
 class WebSocketService {
   static instance = null;
   socket = null;

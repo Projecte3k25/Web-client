@@ -1,26 +1,82 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./css/login.css";
 
 const Login = () => {
-  const [name, setName] = useState("");
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [face, setFace] = useState("😐");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (name.trim() === "") return;
-    localStorage.setItem("playerName", name); // lo guardamos para usarlo después
-    navigate("/home");
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    if (id === "username") setLogin(value);
+    if (id === "password") setPassword(value);
+    if (value.trim() !== "" && login.trim() !== "" && password.trim() !== "") {
+      setFace("😊");
+    } else {
+      setFace("😐");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
+      console.log(backendHost);
+      const response = await fetch(`http://${backendHost}/api/usuaris/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ login, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("playerName", login);
+      setFace("🎉");
+      navigate("/home");
+    } catch (error) {
+      console.error(error);
+      setFace("😢");
+      alert("Login failed. Please check your credentials.");
+    }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Ingresá tu nombre</h2>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Jugador..."
-      />
-      <button onClick={handleLogin}>Entrar</button>
+    <div className="login-box">
+      <h2>Login</h2>
+      <div id="face">{face}</div>
+      <form id="loginForm" onSubmit={handleSubmit}>
+        <div className="input-box">
+          <input
+            type="text"
+            id="username"
+            value={login}
+            onChange={handleInputChange}
+            required
+          />
+          <label>Username</label>
+        </div>
+        <div className="input-box">
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={handleInputChange}
+            required
+          />
+          <label>Password</label>
+        </div>
+        <button type="submit" id="loginBtn" disabled={!(login && password)}>
+          Login
+        </button>
+      </form>
     </div>
   );
 };

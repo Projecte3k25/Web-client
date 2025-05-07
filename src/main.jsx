@@ -8,6 +8,7 @@ import Lobby from "./pages/Lobby.jsx";
 import GameBoard from "./pages/GameBoard.jsx";
 import "./index.css";
 import { WebSocketProvider } from "./context/WebSocketContext.jsx";
+import Test from "./pages/Test.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/home" element={<Home />} />
           <Route path="/lobby" element={<Lobby />} />
           <Route path="/game" element={<GameBoard />} />
+          <Route path="/test" element={<Test />} />
         </Routes>
       </BrowserRouter>
     </WebSocketProvider>

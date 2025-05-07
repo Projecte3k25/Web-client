@@ -1,49 +1,50 @@
 import { useEffect, useState } from "react";
-import WebSocketService from "../services/WebSocketService";
+import { useLocation } from "react-router-dom";
+import useWebSocket from "../hooks/useWebSocket";
+import messageHandlers from "../services/messageHandlers";
 
 const PlayerList = () => {
-  const [players, setPlayers] = useState([]);
+  const location = useLocation();
+  const initialPlayers = location.state?.players || [];
+  const [players, setPlayers] = useState(initialPlayers);
+  const socket = useWebSocket();
+  useEffect(() => {
+    if (players.length === 0) {
+      socket.send(JSON.stringify({ method: "getJugadors" }));
+    }
+  }, []);
 
   useEffect(() => {
-    // Al inicio, pedimos la lista de jugadores o nos suscribimos a actualizaciones
-    WebSocketService.onMessage((event) => {
-      const data = JSON.parse(event.data);
+    const unsubscribe = socket.onMessage((rawData) => {
+      try {
+        const data = JSON.parse(rawData);
+        const handler = messageHandlers[data.method];
 
-      if (data.method === "playerJoined") {
-        setPlayers((prevPlayers) => [...prevPlayers, data.player]);
+        if (handler) {
+          handler(data, setPlayers);
+        } else {
+          console.warn("Método no reconocido:", data.method);
+        }
+      } catch (err) {
+        console.error("Error al parsear mensaje:", err);
       }
     });
 
-    // Envía mensaje para obtener jugadores iniciales cuando se conecta
-    WebSocketService.send(JSON.stringify({ method: "getPlayersLobby" }));
-
     return () => {
-      // Cleanup si es necesario
+      unsubscribe();
     };
-  }, []);
+  }, [socket]);
 
   return (
-    <div className="max-h-[400px] overflow-y-auto space-y-2">
+    <div className="max-h-[500px] overflow-y-auto space-y-2">
       <h3 className="text-2xl">Jugadores en el Lobby</h3>
       <ul>
         {players.map((player) => (
           <li
             key={player.id}
-            className="p-2 w-full border border-blue-500 rounded"
+            className="p-2 w-full border border-blue-500 rounded mb-1"
           >
-            {player.name}
-          </li>
-        ))}
-        {[
-          "Player 1",
-          "Player 2",
-          "Player 3",
-          "Player 4",
-          "Player 5",
-          "Player 6",
-        ].map((name, index) => (
-          <li key={index} className="p-2 w-full border border-blue-500 rounded">
-            {name}
+            {player.nom}
           </li>
         ))}
       </ul>
