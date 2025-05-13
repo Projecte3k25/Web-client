@@ -30,7 +30,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   /* background-image: url("/src/assets/background.jpg"); */
-  background-image: url("/etiqueta.png");
+  background-image: url("/test1.jpg");
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -53,4 +54,12 @@ h1 {
   button {
     background-color: #f9f9f9;
   }
+}
+.lock-icon {
+  fill: gold;
+  transition: fill 0.3s ease;
+}
+
+.lock-icon:hover {
+  fill: black;
 }

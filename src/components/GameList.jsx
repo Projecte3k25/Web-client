@@ -3,12 +3,14 @@ import useWebSocket from "../hooks/useWebSocket";
 import messageHandlers from "../services/messageHandlers";
 import { useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
+import CreateGameModal from "./CreateGameModal";
 
 const GameList = () => {
   const [games, setGames] = useState([]);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [passwordInput, setPasswordInput] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const socket = useWebSocket();
   const navigate = useNavigate();
@@ -18,17 +20,18 @@ const GameList = () => {
       try {
         const data = JSON.parse(rawData);
 
-        if (data.method === "getJugadors") {
-          console.log(data);
-          navigate("/lobby", { state: { players: data.data } });
-        } else if (data.method === "error") {
-          alert(
-            data.data?.message || "Ocurrió un error al unirse a la partida."
-          );
+        if (data.method === "lobby") {
+          const { jugadors, partida } = data.data || {};
+          navigate("/lobby", {
+            state: {
+              players: jugadors || [],
+              game: partida || null,
+            },
+          });
         } else {
           const handler = messageHandlers[data.method];
           if (handler) {
-            handler(data, setGames);
+            if (data.method === "getPartidas") handler(data, setGames);
           } else {
             console.warn("Método no reconocido:", data.method);
           }
@@ -52,7 +55,7 @@ const GameList = () => {
         method: "joinPartida",
         data: { partida: game.id },
       });
-      console.log("Enviando mensaje joinPartida (pública):", message);
+
       socket.send(message);
     }
   };
@@ -61,19 +64,22 @@ const GameList = () => {
     e.preventDefault();
     if (!selectedGameId) return;
 
-    const message = JSON.stringify({
-      method: "joinPartida",
-      data: { partida: selectedGameId, password: passwordInput },
-    });
-    console.log("Enviando mensaje joinPartida (privada):", message);
-    socket.send(message);
+    const game = games.find((g) => g.id === selectedGameId);
+    if (game) {
+      const message = JSON.stringify({
+        method: "joinPartida",
+        data: { partida: selectedGameId, password: passwordInput },
+      });
+      socket.send(message);
+    }
+
     setShowPasswordModal(false);
     setPasswordInput("");
     setSelectedGameId(null);
   };
 
   return (
-    <div className="max-h-[500px] overflow-y-auto space-y-2 relative">
+    <div className="max-h-[500px] min-h-[500px] overflow-y-auto space-y-2 relative">
       <h3 className="text-4xl text-center text-black pb-3.5">
         Partidas disponibles
       </h3>
@@ -82,23 +88,37 @@ const GameList = () => {
           <li
             key={game.id}
             onClick={() => handleJoinGame(game)}
-            className="group relative flex items-center justify-between p-4 w-full max-w-full border border-green-500 rounded-2xl mb-2 cursor-pointer shadow transition-transform transform hover:scale-102 overflow-hidden"
+            className={`group relative flex items-center justify-between p-4 w-full max-w-full rounded-2xl mb-2 cursor-pointer shadow transition-transform transform hover:scale-102 overflow-hidden
+    ${
+      game.publica === 0
+        ? "border-3 border-yellow-400"
+        : "border-3 border-green-500"
+    }`}
           >
             <div
               className="absolute inset-0  bg-center filter grayscale group-hover:filter-none transition-all duration-500"
-              style={{ backgroundImage: "url('/etiqueta.jpg')" }}
+              style={{ backgroundImage: "url('/war.jpg')" }}
             ></div>
 
-            <div className="relative z-10 flex flex-col text-gray-900 drop-shadow pl-4">
-              <span className="text-xl font-semibold">{game.nom}</span>
-              <span className="text-sm">
+            <div className="relative z-10 flex flex-col text-gray-900 drop-shadow pl-4 ">
+              <span className="text-xl font-bold text-black group-hover:text-black  transition-colors duration-300 drop-shadow-md">
+                {game.nom}
+              </span>
+              <span className="text-sm font-bold text-black group-hover:text-black transition-colors duration-300 drop-shadow-md">
                 Jugadores en lobby: {game.current_players}/{game.max_players}
               </span>
             </div>
 
             {game.publica === 0 && (
               <div className="relative z-10 ml-4 text-white drop-shadow">
-                <Lock size={40} fontWeight={100} className="text-black " />
+                {/* <Lock
+                  size={50}
+                  // fontWeight={60}
+                  strokeWidth={2}
+                  stroke="black"
+                  className="text-black "
+                /> */}
+                <img src="./lock.svg" alt="" className="w-7 h-7 lock-icon" />
               </div>
             )}
           </li>
@@ -132,7 +152,7 @@ const GameList = () => {
                   setShowPasswordModal(false);
                   setPasswordInput("");
                 }}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-600 rounded hover:bg-red-800"
               >
                 Cancelar
               </button>
@@ -145,6 +165,18 @@ const GameList = () => {
             </div>
           </form>
         </div>
+      )}
+      <div className="flex justify-center pt-4 fixed bottom-4 ">
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-lg"
+        >
+          Crear nueva partida
+        </button>
+      </div>
+
+      {showCreateModal && (
+        <CreateGameModal onClose={() => setShowCreateModal(false)} />
       )}
     </div>
   );

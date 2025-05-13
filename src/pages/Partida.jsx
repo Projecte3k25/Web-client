@@ -3,7 +3,7 @@ const mockCountries = [
   { id: "bra", name: "Brasil", owner: "Jugador 2", troops: 5 },
 ];
 
-const GameBoard = () => {
+const Partida = () => {
   return (
     <div>
       <h2>Tablero</h2>
@@ -23,4 +23,4 @@ const GameBoard = () => {
   );
 };
 
-export default GameBoard;
+export default Partida;

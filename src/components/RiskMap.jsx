@@ -113,10 +113,12 @@ export default function RiskMap() {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full max-w-6xl mx-auto"
-      dangerouslySetInnerHTML={{ __html: svgContent }}
-    />
+    <div className="absolute inset-0 flex items-center justify-center z-0">
+      <div
+        ref={containerRef}
+        className="w-full h-full flex items-center justify-center"
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+      />
+    </div>
   );
 }

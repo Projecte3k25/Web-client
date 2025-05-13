@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
 
@@ -19,6 +19,13 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -37,8 +44,9 @@ const Login = () => {
       }
 
       const data = await response.json();
-      sessionStorage.setItem("token", data.token);
-      sessionStorage.setItem("playerName", login);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("playerName", login);
+      localStorage.setItem("freshLogin", "true");
       setFace("🎉");
       navigate("/home");
     } catch (error) {
