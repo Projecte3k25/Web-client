@@ -150,12 +150,15 @@ export default function RiskMap({
       }
     };
     const handleClickColocacio = (territorioId, path, group) => {
-      if (!jugadorActual || jugadorActual.posicio !== myPosition) return;
+      const profileId = parseInt(localStorage.getItem("profile"), 10);
+      if (!jugadorActual || jugadorActual.id !== profileId) return;
 
-      // Verifica que no esté ya ocupado por otro jugador
       const currentColor = path.getAttribute("fill");
       const colorYaUsado = Object.values(posicioColors).includes(currentColor);
       if (colorYaUsado) return;
+
+      const svg = containerRef.current?.querySelector("svg");
+      if (!svg) return;
 
       // Pintar el territorio
       if (group && groupedCountries.has(group.id)) {
@@ -166,29 +169,41 @@ export default function RiskMap({
         path.setAttribute("fill", posicioColors[myPosition]);
       }
 
+      // Mostrar círculo y texto con valor 1
+      const circle = svg.querySelector(`#${territorioId}_C`);
+      const text = svg.querySelector(`#${territorioId}_T`);
+
+      if (circle) {
+        circle.style.display = "inline";
+        circle.setAttribute("fill", "black");
+      }
+
+      if (text) {
+        text.style.display = "inline";
+        text.textContent = "1";
+      }
+
       // Enviar al servidor
       const msg = JSON.stringify({
-        method: "colocarTropa",
+        method: "accio",
         data: {
-          territorio: territorioId,
-          jugadorId: jugadorActual.jugador.id,
-          cantidad: 1,
+          territori: territorioId,
         },
       });
 
       socket.send(msg);
     };
+
     const handleClickReforc = (territorioId) => {
-      if (!jugadorActual || jugadorActual.posicio !== myPosition) return;
+      const profileId = parseInt(localStorage.getItem("profile"), 10);
+      if (!jugadorActual || jugadorActual.id !== profileId) return;
 
       const svg = containerRef.current?.querySelector("svg");
       if (!svg) return;
 
-      const textEl = svg.querySelector(`#${territorioId}_T`);
       const pathEl =
         svg.querySelector(`path[id="${territorioId}"]`) ||
         svg.querySelector(`g[id="${territorioId}"] path`);
-
       if (!pathEl) return;
 
       const currentColor = pathEl.getAttribute("fill");
@@ -197,24 +212,31 @@ export default function RiskMap({
       // Verificar que sea territorio propio
       if (currentColor !== playerColor) return;
 
-      let currentValue = parseInt(textEl?.textContent || "0", 10);
-      currentValue = isNaN(currentValue) ? 0 : currentValue + 1;
+      // Obtener elementos del SVG
+      const textEl = svg.querySelector(`#${territorioId}_T`);
+      const circleEl = svg.querySelector(`#${territorioId}_C`);
 
+      // Leer valor actual y aumentar en 1
+      let currentValue = parseInt(textEl?.textContent || "0", 10);
+      currentValue = isNaN(currentValue) ? 1 : currentValue + 1;
+
+      // Actualizar texto
       if (textEl) {
         textEl.textContent = currentValue.toString();
         textEl.style.display = "inline";
       }
 
-      // Mostrar círculo si existe
-      const circleEl = svg.querySelector(`#${territorioId}_C`);
-      if (circleEl) circleEl.style.display = "inline";
+      // Mostrar círculo
+      if (circleEl) {
+        circleEl.style.display = "inline";
+        circleEl.setAttribute("fill", "black");
+      }
 
+      // Enviar acción al servidor
       const msg = JSON.stringify({
-        method: "reforzarTropa",
+        method: "accio",
         data: {
-          territorio: territorioId,
-          jugadorId: jugadorActual.jugador.id,
-          cantidad: 1,
+          territori: territorioId,
         },
       });
 
