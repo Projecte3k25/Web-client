@@ -10,7 +10,7 @@ const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
 const PlayerList = ({ players, game }) => {
   const { profile } = useProfile();
-  console.log(players);
+  // console.log(players);
   const socket = useWebSocket();
   return (
     <div className="max-h-[500px] overflow-y-auto space-y-2">

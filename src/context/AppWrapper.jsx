@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useWebSocket from "../hooks/useWebSocket";
 import { ProfileProvider } from "./ProfileContext";
+import { toast } from "react-hot-toast";
 
 const AppWrapper = ({ children }) => {
   const ws = useWebSocket();
@@ -81,6 +82,25 @@ const AppWrapper = ({ children }) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [location.pathname, ws, navigate]);
+
+  useEffect(() => {
+    if (!ws.socket) return;
+
+    const handleMessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.method === "error" && message.data?.message) {
+          toast.error(message.data.message);
+          // alert(message.data.message);
+        }
+      } catch (e) {
+        console.error("Error parsing global WS message", e);
+      }
+    };
+
+    ws.socket.addEventListener("message", handleMessage);
+    return () => ws.socket.removeEventListener("message", handleMessage);
+  }, [ws.socket]);
 
   return <ProfileProvider>{children}</ProfileProvider>;
 };

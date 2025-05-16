@@ -1,50 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useWebSocket from "../hooks/useWebSocket";
-import messageHandlers from "../services/messageHandlers";
-import { useNavigate } from "react-router-dom";
+
 import { Lock } from "lucide-react";
 import CreateGameModal from "./CreateGameModal";
 
-const GameList = () => {
-  const [games, setGames] = useState([]);
+const GameList = ({ games = [] }) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [passwordInput, setPasswordInput] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const socket = useWebSocket();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = socket.onMessage((rawData) => {
-      try {
-        const data = JSON.parse(rawData);
-
-        if (data.method === "lobby") {
-          const { jugadors, partida } = data.data || {};
-          navigate("/lobby", {
-            state: {
-              players: jugadors || [],
-              game: partida || null,
-            },
-          });
-        } else {
-          const handler = messageHandlers[data.method];
-          if (handler) {
-            if (data.method === "getPartidas") handler(data, setGames);
-          } else {
-            console.warn("Método no reconocido:", data.method);
-          }
-        }
-      } catch (err) {
-        console.error("Error al parsear mensaje:", err);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [socket, navigate]);
 
   const handleJoinGame = (game) => {
     if (game.publica === 0) {

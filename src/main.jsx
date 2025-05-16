@@ -9,13 +9,16 @@ import "./index.css";
 import { WebSocketProvider } from "./context/WebSocketContext.jsx";
 import Test from "./pages/Test.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Partida from "./pages/Partida.jsx";
+
 import AppWrapper from "./context/AppWrapper.jsx";
+import { Toaster } from "react-hot-toast";
+import GameRoom from "./pages/GameRoom.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <WebSocketProvider>
       <BrowserRouter>
+        <Toaster position="top-right" />
         <AppWrapper>
           <Routes>
             <Route path="/" element={<Login />} />
@@ -40,7 +43,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               path="/game"
               element={
                 <ProtectedRoute>
-                  <Partida />
+                  <GameRoom />
                 </ProtectedRoute>
               }
             />

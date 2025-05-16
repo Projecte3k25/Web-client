@@ -21,7 +21,6 @@ const Lobby = () => {
   const [players, setPlayers] = useState(initialPlayers);
   const [game, setGame] = useState(location.state?.game || null);
 
-  // console.log(profile);
   useEffect(() => {
     if (initialPlayers.length === 0) {
       socket.send(JSON.stringify({ method: "lobby" }));
@@ -33,10 +32,23 @@ const Lobby = () => {
       try {
         const data = JSON.parse(rawData);
 
+        // Procesar mensajes lobby y joinPlayer normalmente
         const validMethods = ["lobby", "joinPlayer"];
         if (validMethods.includes(data.method)) {
           const handler = messageHandlers[data.method];
           if (handler) handler(data, setPlayers, setGame);
+          return;
+        }
+
+        if (data.method === "startPartida") {
+          // console.log(data.data);
+          navigate("/game", {
+            state: {
+              partida: data.data,
+              game,
+              players,
+            },
+          });
         }
       } catch (err) {
         console.error("Error al parsear mensaje:", err);
@@ -46,13 +58,21 @@ const Lobby = () => {
     return () => {
       unsubscribe();
     };
-  }, [socket]);
+  }, [socket, game, players, navigate]);
+
   const handleAddBot = () => {
     const messageData = {
       method: "addBot",
       data: {},
     };
     socket.send(JSON.stringify(messageData));
+  };
+  const handleStartGame = () => {
+    const message = JSON.stringify({
+      method: "startPartida",
+      data: {},
+    });
+    socket.send(message);
   };
   useEffect(() => {
     if (!profile) {
@@ -72,7 +92,10 @@ const Lobby = () => {
             <PlayerList players={players} game={game} />
             {game?.admin_id === profile?.id && (
               <>
-                <button className="absolute bottom-5 right-5 px-4 py-2 bg-yellow-400 hover:bg-yellow-800 text-black text-sm rounded-md shadow-lg transition-all cursor-pointer">
+                <button
+                  onClick={handleStartGame}
+                  className="absolute bottom-5 right-5 px-4 py-2 bg-yellow-400 hover:bg-yellow-800 text-black text-sm rounded-md shadow-lg transition-all cursor-pointer"
+                >
                   Ready
                 </button>
                 <button

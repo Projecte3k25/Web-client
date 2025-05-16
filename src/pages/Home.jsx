@@ -9,6 +9,7 @@ import { useProfile } from "../context/ProfileContext";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [games, setGames] = useState([]);
   const ws = useWebSocket();
   const { profile, setProfile } = useProfile();
   const [reconnectData, setReconnectData] = useState(null);
@@ -19,15 +20,27 @@ const Home = () => {
     const handleMessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.method === "profile") {
+
+        if (message.method === "getPartidas") {
+          setGames(message.data); // o usa tu handler si prefieres
+        } else if (message.method === "lobby") {
+          const { jugadors, partida } = message.data || {};
+          navigate("/lobby", {
+            state: {
+              players: jugadors || [],
+              game: partida || null,
+            },
+          });
+        } else if (message.method === "profile") {
           setProfile(message.data);
-        } else if (message.type === "reconnect_offer") {
-          setReconnectData(message);
-          setShowReconnectModal(true);
+          localStorage.setItem("profile", message.data.id);
         } else if (message.method === "getRanking") {
           if (Array.isArray(message.data)) {
             setRanking(message.data);
           }
+        } else if (message.type === "reconnect_offer") {
+          setReconnectData(message);
+          setShowReconnectModal(true);
         }
       } catch (err) {
         console.error("Error parsing WS message:", err);
@@ -55,7 +68,7 @@ const Home = () => {
           </div>
           <div className="w-2/3 pl-6 flex flex-col justify-between">
             <div>
-              <GameList />
+              <GameList games={games} />
             </div>
           </div>
         </div>

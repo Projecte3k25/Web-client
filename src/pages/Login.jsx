@@ -58,7 +58,7 @@ const Login = () => {
 
   return (
     <div className="login-box">
-      <h2>Login</h2>
+      <h2 className="text-3xl bold">Login</h2>
       <div id="face">{face}</div>
       <form id="loginForm" onSubmit={handleSubmit}>
         <div className="input-box">
