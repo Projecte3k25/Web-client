@@ -9,7 +9,7 @@ const posicioColors = {
   5: "#FF9800", // naranja
   6: "#c81d11", // rojo
 };
-
+const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 const PlayerSidebar = ({ jugadores, jugadorActual }) => {
   return (
     <>
@@ -21,7 +21,7 @@ const PlayerSidebar = ({ jugadores, jugadorActual }) => {
           return (
             <img
               key={jugador.jugador.id}
-              src={jugador.jugador.avatar}
+              src={`http://${backendHost}${jugador.jugador.avatar}`}
               alt={jugador.jugador.nom}
               style={{ borderColor }}
               className={clsx(

@@ -6,6 +6,7 @@ import RiskMap from "../components/RiskMap";
 import PlayerList from "../components/PlayerList";
 import GameBoard from "../components/GameBoard";
 import PlayerSidebar from "../components/PlayerSidebar";
+import TurnManager from "../components/TurnManager";
 
 const GameRoom = () => {
   const { state } = useLocation();
@@ -38,11 +39,18 @@ const GameRoom = () => {
           );
         }
         if (msg.method === "canviFase") {
-          const { fase, jugadorActual, tiempo, territorios } = msg.data;
+          const {
+            fase,
+            jugadorActual,
+            temps: tiempo,
+            territoris: territorios,
+            tropas,
+            cartas,
+          } = msg.data;
           setFaseActual(fase);
           setJugadorActual(jugadorActual);
-          setTropasDisponibles(jugadorActual.tropas);
-          setCartas(jugadorActual.cartas);
+          setTropasDisponibles(tropas);
+          setCartas(cartas);
           setTiempoTurno(tiempo);
           setTerritorios(territorios);
         }
@@ -50,7 +58,7 @@ const GameRoom = () => {
         if (msg.method === "allLoaded") {
           setAllLoaded(true);
         }
-        if (msg.method === "finalFase") {
+        if (msg.method === "accio") {
           setUltimaAccion((prev) =>
             JSON.stringify(prev) !== JSON.stringify(msg.data) ? msg.data : prev
           );
@@ -84,21 +92,22 @@ const GameRoom = () => {
           territorios={territorios}
           ultimaAccion={ultimaAccion}
         />
-        {/* {jugadorActual && (
+        {allLoaded && faseActual && jugadorActual && (
           <TurnManager
             jugador={jugadorActual}
             tiempoTotal={tiempoTurno}
             fase={faseActual}
             tropasDisponibles={tropasDisponibles}
+            jugadores={partida.jugadors}
           />
         )}
 
-        {partida?.jugadors && jugadorActual && (
+        {allLoaded && faseActual && partida?.jugadors && jugadorActual && (
           <PlayerSidebar
             jugadores={partida.jugadors}
             jugadorActual={jugadorActual}
           />
-        )} */}
+        )}
       </GameBoard>
     </div>
   );

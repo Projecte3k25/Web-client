@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
+const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
+const posicioColors = {
+  1: "#00913f", // verde
+  2: "#2196F3", // azul
+  3: "#FFEB3B", // amarillo
+  4: "#9C27B0", // morado
+  5: "#FF9800", // naranja
+  6: "#c81d11", //rojo
+};
 
 export default function TurnManager({
   jugador,
   tiempoTotal,
   fase,
   tropasDisponibles,
+  jugadores,
 }) {
+  const posi = jugadores?.find((e) => e.jugador.id === jugador.id)?.posicio;
   const [tiempoRestante, setTiempoRestante] = useState(tiempoTotal);
-  const color = posicioColors[jugador.posicio] || "#000";
-
+  console.log(tiempoTotal);
+  const color = posicioColors[posi] || "#000";
   useEffect(() => {
+    // Cada vez que cambia jugador o el tiempo total, reiniciar el tiempo restante
+    setTiempoRestante(tiempoTotal);
+
     const timer = setInterval(() => {
       setTiempoRestante((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-
           return 0;
         }
         return prev - 1;
@@ -22,7 +35,7 @@ export default function TurnManager({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [tiempoTotal]);
+  }, [jugador.id, tiempoTotal]); // ahora depende también de jugador.id
 
   const porcentaje = (tiempoRestante / tiempoTotal) * 100;
 
@@ -41,13 +54,13 @@ export default function TurnManager({
 
       <div className="flex items-center gap-3">
         <img
-          src={jugador.user.avatar}
-          alt={jugador.user.nom}
+          src={`http://${backendHost}${jugador.avatar}`}
+          alt={jugador.nom}
           className="w-12 h-12 rounded-full border-2"
           style={{ borderColor: posicioColors[jugador.posicio] }}
         />
         <div className="flex flex-col">
-          <span className="font-medium text-gray-800">{jugador.user.nom}</span>
+          <span className="font-medium text-gray-800">{jugador.nom}</span>
           <span className="text-sm text-gray-600">
             Tropas: {tropasDisponibles}
           </span>
@@ -56,11 +69,3 @@ export default function TurnManager({
     </div>
   );
 }
-const posicioColors = {
-  1: "#00913f", // verde
-  2: "#2196F3", // azul
-  3: "#FFEB3B", // amarillo
-  4: "#9C27B0", // morado
-  5: "#FF9800", // naranja
-  6: "#c81d11", //rojo
-};

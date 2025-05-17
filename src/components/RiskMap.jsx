@@ -24,6 +24,10 @@ export default function RiskMap({
   const [myPosition, setMyPosition] = useState(null);
 
   const groupedCountries = new Set(["INDONESIA", "GREAT_BRITAIN"]);
+  useEffect(() => {
+    if (!svgContent) return;
+    updateStyles();
+  }, [svgContent]);
 
   useEffect(() => {
     if (
@@ -255,17 +259,17 @@ export default function RiskMap({
       });
     };
   });
-  useEffect(() => {
-    if (!svgContent || !containerRef.current || myPosition === null) return;
+  // useEffect(() => {
+  //   if (!svgContent || !containerRef.current || myPosition === null) return;
 
-    const svgElement = containerRef.current.querySelector("svg");
-    if (!svgElement) return;
+  //   const svgElement = containerRef.current.querySelector("svg");
+  //   if (!svgElement) return;
 
-    // código para ocultar circles, texts...
+  //   // código para ocultar circles, texts...
 
-    console.log("Calling updateStyles with myPosition:", myPosition);
-    updateStyles();
-  }, [svgContent, myPosition]);
+  //   console.log("Calling updateStyles with myPosition:", myPosition);
+  //   updateStyles();
+  // }, [svgContent, myPosition]);
 
   const updateStyles = () => {
     // console.log("entro");
@@ -332,6 +336,40 @@ export default function RiskMap({
 
     return () => clearTimeout(timeout); // limpieza
   }, [jugadors, myPosition]);
+  useEffect(() => {
+    if (!svgContent || !territorios) return;
+
+    const svg = containerRef.current?.querySelector("svg");
+    if (!svg) return;
+
+    Object.entries(territorios).forEach(([id, data]) => {
+      const color = posicioColors[data.posicio];
+
+      const group = svg.querySelector(`g[id="${id}"]`);
+      if (group) {
+        // Si es un grupo, pintar todos sus paths
+        const paths = group.querySelectorAll("path");
+        paths.forEach((p) => p.setAttribute("fill", color));
+      } else {
+        // Si no es grupo, buscar el path directamente
+        const path = svg.querySelector(`path[id="${id}"]`);
+        if (path) path.setAttribute("fill", color);
+      }
+
+      const circle = svg.querySelector(`#${id}_C`);
+      const text = svg.querySelector(`#${id}_T`);
+
+      if (circle) {
+        circle.style.display = "inline";
+        circle.setAttribute("fill", "black");
+      }
+
+      if (text) {
+        text.style.display = "inline";
+        text.textContent = data.tropas.toString();
+      }
+    });
+  }, [territorios, svgContent]);
 
   return (
     <div className="absolute inset-0 flex items-start justify-center z-0">
