@@ -18,7 +18,7 @@ export default function TurnManager({
 }) {
   const posi = jugadores?.find((e) => e.jugador.id === jugador.id)?.posicio;
   const [tiempoRestante, setTiempoRestante] = useState(tiempoTotal);
-  console.log(tiempoTotal);
+
   const color = posicioColors[posi] || "#000";
   useEffect(() => {
     // Cada vez que cambia jugador o el tiempo total, reiniciar el tiempo restante
