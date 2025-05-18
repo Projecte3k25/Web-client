@@ -16,6 +16,7 @@ export default function RiskMap({
   jugadorActual,
   territorios,
   ultimaAccion,
+  fronteras,
 }) {
   const containerRef = useRef(null);
   const selectedIdsRef = useRef(new Set());
@@ -129,6 +130,14 @@ export default function RiskMap({
       text.style.display = "none";
       text.style.pointerEvents = "none"; // No bloquear clics
     });
+    function updateTropasText(id, tropas) {
+      const svg = containerRef.current.querySelector("svg");
+      const text = svg?.querySelector(`#${id}_T`);
+      if (text) {
+        text.textContent = tropas.toString();
+        text.style.display = "inline";
+      }
+    }
 
     const handleClick = (e) => {
       const path = e.target;
@@ -148,6 +157,9 @@ export default function RiskMap({
           break;
         case "Reforç":
           handleClickReforc(idToUse);
+          break;
+        case "ReforçTropes":
+          handleClickReforcTropes(idToUse);
           break;
         default:
           console.log(`No se ha definido acción para la fase: ${fase}`);
@@ -241,6 +253,63 @@ export default function RiskMap({
         method: "accio",
         data: {
           territori: territorioId,
+        },
+      });
+
+      socket.send(msg);
+    };
+    const handleClickReforcTropes = (territorioId) => {
+      const profileId = parseInt(localStorage.getItem("profile"), 10);
+      if (!jugadorActual || jugadorActual.id !== profileId) return;
+
+      const svg = containerRef.current?.querySelector("svg");
+      if (!svg) return;
+
+      const pathEl =
+        svg.querySelector(`path[id="${territorioId}"]`) ||
+        svg.querySelector(`g[id="${territorioId}"] path`);
+      if (!pathEl) return;
+
+      const currentColor = pathEl.getAttribute("fill");
+      const playerColor = posicioColors[myPosition];
+
+      // Verificar que sea territorio propio
+      if (currentColor !== playerColor) return;
+
+      const textEl = svg.querySelector(`#${territorioId}_T`);
+      const circleEl = svg.querySelector(`#${territorioId}_C`);
+
+      // Preguntar al usuario cuántas tropas quiere añadir
+      const input = prompt("¿Cuántas tropas quieres añadir?");
+      const tropas = parseInt(input, 10);
+
+      if (isNaN(tropas) || tropas <= 0) {
+        alert("Número inválido.");
+        return;
+      }
+
+      // Obtener valor actual del texto
+      let currentValue = parseInt(textEl?.textContent || "0", 10);
+      currentValue = isNaN(currentValue) ? tropas : currentValue + tropas;
+
+      // Actualizar texto
+      if (textEl) {
+        textEl.textContent = currentValue.toString();
+        textEl.style.display = "inline";
+      }
+
+      // Mostrar círculo
+      if (circleEl) {
+        circleEl.style.display = "inline";
+        circleEl.setAttribute("fill", "black");
+      }
+
+      // Enviar acción al servidor
+      const msg = JSON.stringify({
+        method: "accio",
+        data: {
+          territori: territorioId,
+          reforc: tropas,
         },
       });
 

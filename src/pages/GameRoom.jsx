@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import useWebSocket from "../hooks/useWebSocket";
 import LoadingScreen from "../components/LoadingScreen";
@@ -15,7 +15,7 @@ const GameRoom = () => {
   const partida = state?.partida;
   const game = state?.game;
   const players = state?.players;
-  // console.log(partida.jugadors);
+  // console.log(partida.territoris);
   const [gameData, setGameData] = useState(null);
   const [playersLoaded, setPlayersLoaded] = useState([]);
   const [allLoaded, setAllLoaded] = useState(false);
@@ -27,6 +27,7 @@ const GameRoom = () => {
   const [tiempoTurno, setTiempoTurno] = useState(0);
   const [territorios, setTerritorios] = useState({});
   const [ultimaAccion, setUltimaAccion] = useState(null);
+  const faseRef = useRef(null);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -47,6 +48,7 @@ const GameRoom = () => {
             tropas,
             cartas,
           } = msg.data;
+          faseRef.current = msg.data.fase;
           setFaseActual(fase);
           setJugadorActual(jugadorActual);
           setTropasDisponibles(tropas);
@@ -59,8 +61,65 @@ const GameRoom = () => {
           setAllLoaded(true);
         }
         if (msg.method === "accio") {
+          let nuevaAccion = null;
+          const fase = faseRef.current;
+          console.log(fase);
+          switch (fase) {
+            case "Colocacio":
+              nuevaAccion = {
+                tipo: "Colocacio",
+                territorio: msg.data.territori,
+                posicio: msg.data.posicio,
+              };
+              break;
+
+            case "Reforç":
+              nuevaAccion = {
+                tipo: "Reforç",
+                territorio: msg.data.territori,
+              };
+              break;
+
+            case "ReforçTropes":
+              nuevaAccion = {
+                tipo: "ReforçTropes",
+                territorio: msg.data.territori,
+                tropas: msg.data.tropas,
+              };
+              break;
+
+            case "Atac":
+              nuevaAccion = {
+                tipo: "Atac",
+                from: msg.data.FromTerritori,
+                to: msg.data.toTerritori,
+                dadosAtac: msg.data.dadosAtac,
+                dadosDefensa: msg.data.dadosDefensa,
+                atacTropas: msg.data.atacTropas,
+                defTropas: msg.data.defTropas,
+                conquista: msg.data.conquista,
+              };
+              break;
+
+            case "Recolocacio":
+              nuevaAccion = {
+                tipo: "Recolocacio",
+                from: msg.data.FromTerritori,
+                to: msg.data.toTerritori,
+                tropas: msg.data.tropas,
+              };
+              break;
+
+            default:
+              console.warn("Fase no reconocida para accio", faseActual);
+              nuevaAccion = msg.data;
+              break;
+          }
+
           setUltimaAccion((prev) =>
-            JSON.stringify(prev) !== JSON.stringify(msg.data) ? msg.data : prev
+            JSON.stringify(prev) !== JSON.stringify(nuevaAccion)
+              ? nuevaAccion
+              : prev
           );
         }
       } catch (err) {
@@ -91,6 +150,7 @@ const GameRoom = () => {
           jugadorActual={jugadorActual} /**/
           territorios={territorios}
           ultimaAccion={ultimaAccion}
+          fronteras={partida.territoris}
         />
         {allLoaded && faseActual && jugadorActual && (
           <TurnManager
@@ -99,6 +159,7 @@ const GameRoom = () => {
             fase={faseActual}
             tropasDisponibles={tropasDisponibles}
             jugadores={partida.jugadors}
+            cartas
           />
         )}
 

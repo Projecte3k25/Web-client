@@ -1,0 +1,103 @@
+/* CardDeck.css */
+:root {
+  --card-width: 8rem;
+  --card-animation: slide-down 1s ease-in-out backwards;
+}
+
+.card-deck-container {
+  position: relative;
+  height: 100%;
+}
+
+.toggle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #2f855a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Space Grotesk", "Roboto", sans-serif;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #308a6d;
+  transform: scale(1.05);
+}
+
+.cards-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.card {
+  background: black;
+
+  position: relative;
+  width: var(--card-width);
+  aspect-ratio: 2/3;
+  border-radius: 1rem;
+  position: absolute;
+  top: calc(65% - (var(--card-width) * 0.2 / 8));
+  right: calc(75% - (var(--card-width) / 3.5));
+  transform-origin: 10% 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  border: solid 2px #78787800;
+  transition: rotate 0.2s ease-in-out, transform 0.3s ease-in-out;
+  pointer-events: auto;
+  cursor: pointer;
+  /* overflow: hidden; */
+}
+
+.card:hover {
+  filter: brightness(1.03);
+  transform: translateX(calc(-4rem * sin(20deg)))
+    translateY(calc(-4rem * cos(20deg))) rotate(-5deg);
+}
+
+.card.selected {
+  border: solid 2px #787878;
+}
+.card img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 1rem; /* <-- agrega esto */
+}
+@keyframes slide-down {
+  0% {
+    opacity: 0;
+    rotate: 45deg;
+    transform: translateX(50vw) translateY(-50vh) rotate(5deg);
+  }
+  40% {
+    opacity: 100%;
+  }
+  75% {
+    transform: translateX(0) translateY(0) rotate(0);
+  }
+  100% {
+    transform: translateX(inset) translateY(inset) rotate(inset);
+  }
+}
+
+/* Efecto de hover en cascada */
+.card:hover ~ .card {
+  transform: rotate(15deg);
+}
+
+.card:hover ~ .card ~ .card {
+  transform: rotate(5deg);
+}

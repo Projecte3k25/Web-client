@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import RiskMap from "../components/RiskMap";
 import GameBoard from "../components/GameBoard";
 import "./css/test.css";
@@ -6,6 +6,7 @@ import BattleDiceRoller from "../components/BattleDiceRoller";
 import TurnManager from "../components/TurnManager";
 import LoadingScreen from "../components/LoadingScreen";
 import PlayerSidebar from "../components/PlayerSidebar";
+import CardDeck from "../components/CardDeck";
 
 const jugador = {
   user: {
@@ -37,26 +38,68 @@ const jugadorActu = {
   jugador: { id: 2, nombre: "Jugador Verde" },
   posicio: 2,
 };
+const countries = ["BRAZIL", "SIAM", "ARGENTINA", "JAPAN"];
 function Test() {
+  const [isDeckOpen, setIsDeckOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+
+  const toggleDeck = () => {
+    setIsDeckOpen(!isDeckOpen);
+    if (isDeckOpen) {
+      setSelectedCard(null);
+    }
+  };
+
+  const handleCardClick = (index) => {
+    setSelectedCard(selectedCard === index ? null : index);
+  };
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
       <GameBoard>
-        {/* <LoadingScreen gameName={gmnom} players={players}></LoadingScreen> */}
-        <RiskMap
-          jugadors={jugadoresDePrueba} /*partida.jugadors*/
-          fase={"Colocacio"} /*faseActual*/
-          jugadorActual={jugadorActu} /*jugadorActual*/
+        {/* <RiskMap
+          jugadors={jugadoresDePrueba} 
+          fase={"Colocacio"}
+          jugadorActual={jugadorActu} 
         />
+        
+        <PlayerSidebar
+          jugadores={jugadoresDePrueba}
+          jugadorActual={jugadorActu}
+        /> */}
         <TurnManager
           jugador={jugador}
           tiempoTotal={20}
           fase={"Posicionamiento"}
         />
-        <PlayerSidebar
-          jugadores={jugadoresDePrueba}
-          jugadorActual={jugadorActu}
-        />
-        {/* <BattleDiceRoller></BattleDiceRoller> */}
+        <div className="App">
+          {/* Botón externo que controla el componente */}
+          <button
+            className="toggle-button"
+            onClick={toggleDeck}
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              padding: "10px 20px",
+              backgroundColor: "#2f855a",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontFamily: '"Space Grotesk", "Roboto", sans-serif',
+              zIndex: "1000",
+            }}
+          >
+            {isDeckOpen ? "Ocultar Cartas" : "Mostrar Cartas"}
+          </button>
+
+          <CardDeck
+            cards={countries}
+            isOpen={isDeckOpen}
+            onCardClick={handleCardClick}
+            selectedCard={selectedCard}
+          />
+        </div>
       </GameBoard>
     </div>
   );
