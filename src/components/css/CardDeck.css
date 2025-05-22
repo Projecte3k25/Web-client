@@ -1,32 +1,12 @@
 /* CardDeck.css */
 :root {
-  --card-width: 8rem;
+  --card-width: 7rem;
   --card-animation: slide-down 1s ease-in-out backwards;
 }
 
 .card-deck-container {
   position: relative;
   height: 100%;
-}
-
-.toggle-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background-color: #2f855a;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: "Space Grotesk", "Roboto", sans-serif;
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-
-.toggle-button:hover {
-  background-color: #308a6d;
-  transform: scale(1.05);
 }
 
 .cards-wrapper {
@@ -39,15 +19,16 @@
 }
 
 .card {
-  background: black;
+  background: #f5f5f5;
 
   position: relative;
   width: var(--card-width);
   aspect-ratio: 2/3;
   border-radius: 1rem;
   position: absolute;
-  top: calc(65% - (var(--card-width) * 0.2 / 8));
-  right: calc(75% - (var(--card-width) / 3.5));
+  top: 80%;
+  left: 7%;
+  right: auto;
   transform-origin: 10% 90%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
@@ -55,7 +36,6 @@
   transition: rotate 0.2s ease-in-out, transform 0.3s ease-in-out;
   pointer-events: auto;
   cursor: pointer;
-  /* overflow: hidden; */
 }
 
 .card:hover {
@@ -74,7 +54,7 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-  border-radius: 1rem; /* <-- agrega esto */
+  border-radius: 1rem;
 }
 @keyframes slide-down {
   0% {

@@ -7,6 +7,8 @@ import PlayerList from "../components/PlayerList";
 import GameBoard from "../components/GameBoard";
 import PlayerSidebar from "../components/PlayerSidebar";
 import TurnManager from "../components/TurnManager";
+import GameChat from "../components/GameChat";
+import AnimatedCardFromDeck from "../components/AnimatedCardFromDeck";
 
 const GameRoom = () => {
   const { state } = useLocation();
@@ -15,7 +17,7 @@ const GameRoom = () => {
   const partida = state?.partida;
   const game = state?.game;
   const players = state?.players;
-  // console.log(partida.territoris);
+
   const [gameData, setGameData] = useState(null);
   const [playersLoaded, setPlayersLoaded] = useState([]);
   const [allLoaded, setAllLoaded] = useState(false);
@@ -27,18 +29,89 @@ const GameRoom = () => {
   const [tiempoTurno, setTiempoTurno] = useState(0);
   const [territorios, setTerritorios] = useState({});
   const [ultimaAccion, setUltimaAccion] = useState(null);
+  const [showCardAnimation, setShowCardAnimation] = useState(false);
+  const [currentCard, setCurrentCard] = useState(null);
+
   const faseRef = useRef(null);
+
+  // Referencia para el chat
+  const addSystemMessageRef = useRef(null);
+
+  // Función para obtener nombre del jugador por ID
+  const getPlayerName = (playerId) => {
+    if (!playerId) return "Jugador desconocido";
+    const player = partida?.jugadors?.find((p) => p.jugador.id === playerId);
+    return player?.jugador?.nom || `Jugador ${playerId}`;
+  };
+
+  // Función para obtener nombre del territorio
+  const getTerritoryName = (territoryId) => {
+    // Aquí deberías tener un mapa de territorios con nombres
+    // Por ahora retornamos el ID
+    return territoryId || "Territorio desconocido";
+  };
+
+  // Función para generar mensaje del sistema basado en la acción
+  const generateSystemMessage = (accion) => {
+    // Usar el jugador actual si no hay posición específica en la acción
+    const playerId = accion.jugadorId || jugadorActual;
+    const playerName = getPlayerName(playerId);
+
+    switch (accion.tipo) {
+      case "Colocacio":
+        return `${playerName} ha colocado tropas en ${getTerritoryName(
+          accion.territorio
+        )}`;
+
+      case "Reforç":
+        return `${playerName} ha reforzado ${getTerritoryName(
+          accion.territorio
+        )}`;
+
+      case "ReforçTropes":
+        return `${playerName} ha añadido ${
+          accion.tropas
+        } tropas a ${getTerritoryName(accion.territorio)}`;
+
+      case "Atac":
+        const fromTerritory = getTerritoryName(accion.from);
+        const toTerritory = getTerritoryName(accion.to);
+        const resultado = accion.conquista ? "conquistó" : "atacó";
+        return `${playerName} ${resultado} ${toTerritory} desde ${fromTerritory} (${accion.dausAtac?.join(
+          ","
+        )} vs ${accion.dausDefensa?.join(",")})`;
+
+      case "Recolocacio":
+        return `${playerName} ha movido ${
+          accion.tropas
+        } tropas de ${getTerritoryName(accion.from)} a ${getTerritoryName(
+          accion.to
+        )}`;
+
+      default:
+        return `${playerName} realizó una acción: ${accion.tipo}`;
+    }
+  };
 
   useEffect(() => {
     const handleMessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
         console.log(msg);
-        if (msg.method === "loaded") {
-          setPlayersLoaded((prev) =>
-            prev.includes(msg.data.id) ? prev : [...prev, msg.data.id]
-          );
+
+        if (msg.method === "loaded" && !allLoaded) {
+          setPlayersLoaded((prev) => {
+            if (prev.includes(msg.data.id)) return prev;
+            const newLoaded = [...prev, msg.data.id];
+
+            // Mensaje del sistema cuando se conecta un jugador
+            const playerName = getPlayerName(msg.data.id);
+            addSystemMessage(`${playerName} se ha conectado a la partida`);
+
+            return newLoaded;
+          });
         }
+
         if (msg.method === "canviFase") {
           const {
             fase,
@@ -48,6 +121,7 @@ const GameRoom = () => {
             tropas,
             cartas,
           } = msg.data;
+
           faseRef.current = msg.data.fase;
           setFaseActual(fase);
           setJugadorActual(jugadorActual);
@@ -55,21 +129,29 @@ const GameRoom = () => {
           setCartas(cartas);
           setTiempoTurno(tiempo);
           setTerritorios(territorios);
+
+          // Mensaje del sistema para cambio de fase
+          const playerName = getPlayerName(jugadorActual);
+          addSystemMessage(`Fase ${fase}: Es el turno de ${playerName}`);
         }
 
         if (msg.method === "allLoaded") {
           setAllLoaded(true);
+          addSystemMessage(
+            "¡Todos los jugadores están conectados! La partida puede comenzar."
+          );
         }
+
         if (msg.method === "accio") {
           let nuevaAccion = null;
           const fase = faseRef.current;
-          console.log(fase);
+
           switch (fase) {
             case "Colocacio":
               nuevaAccion = {
                 tipo: "Colocacio",
                 territorio: msg.data.territori,
-                posicio: msg.data.posicio,
+                jugadorId: msg.data.jugadorId || jugadorActual,
               };
               break;
 
@@ -77,6 +159,7 @@ const GameRoom = () => {
               nuevaAccion = {
                 tipo: "Reforç",
                 territorio: msg.data.territori,
+                jugadorId: msg.data.jugadorId || jugadorActual,
               };
               break;
 
@@ -85,28 +168,36 @@ const GameRoom = () => {
                 tipo: "ReforçTropes",
                 territorio: msg.data.territori,
                 tropas: msg.data.tropas,
+                jugadorId: msg.data.jugadorId || jugadorActual,
               };
+              setTropasDisponibles((prev) =>
+                Math.max(0, prev - msg.data.tropas)
+              );
               break;
 
             case "Atac":
               nuevaAccion = {
                 tipo: "Atac",
-                from: msg.data.FromTerritori,
-                to: msg.data.toTerritori,
-                dadosAtac: msg.data.dadosAtac,
-                dadosDefensa: msg.data.dadosDefensa,
+                from: msg.data.from,
+                to: msg.data.to,
+                dausAtac: msg.data.dausAtac,
+                dausDefensa: msg.data.dausDefensa,
                 atacTropas: msg.data.atacTropas,
                 defTropas: msg.data.defTropas,
                 conquista: msg.data.conquista,
+                tropasAtacTotal: msg.data.tropasTotalsAtac,
+                tropasDefTotal: msg.data.torpasTotalsDefensa,
+                jugadorId: msg.data.jugadorId || jugadorActual,
               };
               break;
 
             case "Recolocacio":
               nuevaAccion = {
                 tipo: "Recolocacio",
-                from: msg.data.FromTerritori,
-                to: msg.data.toTerritori,
+                from: msg.data.from,
+                to: msg.data.to,
                 tropas: msg.data.tropas,
+                jugadorId: msg.data.jugadorId || jugadorActual,
               };
               break;
 
@@ -116,11 +207,42 @@ const GameRoom = () => {
               break;
           }
 
-          setUltimaAccion((prev) =>
-            JSON.stringify(prev) !== JSON.stringify(nuevaAccion)
-              ? nuevaAccion
-              : prev
+          setUltimaAccion((prev) => {
+            const isNewAction =
+              JSON.stringify(prev) !== JSON.stringify(nuevaAccion);
+
+            // Añadir mensaje del sistema para la nueva acción
+            if (isNewAction) {
+              const systemMessage = generateSystemMessage(nuevaAccion);
+              addSystemMessage(systemMessage);
+            }
+
+            return isNewAction ? nuevaAccion : prev;
+          });
+        }
+
+        // Manejar otros eventos del juego
+        if (msg.method === "jugadorEliminado") {
+          const playerName = getPlayerName(msg.data.jugadorId);
+          addSystemMessage(`${playerName} ha sido eliminado de la partida`);
+        }
+
+        if (msg.method === "partidaTerminada") {
+          const winnerName = getPlayerName(msg.data.ganador);
+          addSystemMessage(
+            `¡Partida terminada! ${winnerName} ha ganado la partida`
           );
+        }
+        if (msg.method === "robaCarta") {
+          const carta = msg.data.carta;
+          setCurrentCard(carta);
+          setShowCardAnimation(true);
+
+          // Cerrar la animación después de 4 segundos
+          setTimeout(() => {
+            setShowCardAnimation(false);
+            setCurrentCard(null);
+          }, 5000);
         }
       } catch (err) {
         console.error("Error parsing message:", err);
@@ -129,11 +251,51 @@ const GameRoom = () => {
 
     socket.socket?.addEventListener("message", handleMessage);
     return () => socket.socket?.removeEventListener("message", handleMessage);
-  }, [socket]);
-  // console.log(partida.jugadors);
+  }, [socket, partida, allLoaded]);
+
+  // Función para recibir la referencia del addSystemMessage del chat
+  const handleSystemMessageRef = (addSystemMessageFn) => {
+    addSystemMessageRef.current = addSystemMessageFn;
+  };
+
+  // Queue para manejar mensajes del sistema de forma asíncrona
+  const systemMessageQueue = useRef([]);
+
+  // Procesar queue de mensajes del sistema
+  useEffect(() => {
+    if (systemMessageQueue.current.length > 0 && addSystemMessageRef.current) {
+      const messages = [...systemMessageQueue.current];
+      systemMessageQueue.current = [];
+
+      // Usar setTimeout para evitar actualizaciones durante el render
+      setTimeout(() => {
+        messages.forEach((message) => {
+          if (addSystemMessageRef.current) {
+            addSystemMessageRef.current(message);
+          }
+        });
+      }, 0);
+    }
+  }, [systemMessageQueue.current.length]);
+
+  // Prevenir duplicados de mensajes del sistema
+  const lastSystemMessageRef = useRef("");
+
+  // Función helper para agregar mensajes del sistema de forma segura
+  const addSystemMessage = (message) => {
+    // Evitar duplicados consecutivos
+    if (lastSystemMessageRef.current === message) {
+      return;
+    }
+
+    lastSystemMessageRef.current = message;
+    systemMessageQueue.current.push(message);
+    // Forzar re-render para procesar la queue
+    setGameData((prev) => ({ ...prev, _trigger: Date.now() }));
+  };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
       <GameBoard>
         {!allLoaded && (
           <div className="absolute inset-0 z-50 bg-white flex justify-center items-center">
@@ -144,14 +306,18 @@ const GameRoom = () => {
             />
           </div>
         )}
+
         <RiskMap
-          jugadors={partida.jugadors} /**/
-          fase={faseActual} /**/
-          jugadorActual={jugadorActual} /**/
+          jugadors={partida.jugadors}
+          fase={faseActual}
+          jugadorActual={jugadorActual}
           territorios={territorios}
           ultimaAccion={ultimaAccion}
           fronteras={partida.territoris}
+          setTerritorios={setTerritorios}
+          tropasDisponibles={tropasDisponibles}
         />
+
         {allLoaded && faseActual && jugadorActual && (
           <TurnManager
             jugador={jugadorActual}
@@ -159,7 +325,7 @@ const GameRoom = () => {
             fase={faseActual}
             tropasDisponibles={tropasDisponibles}
             jugadores={partida.jugadors}
-            cartas
+            cartas={cartas}
           />
         )}
 
@@ -169,8 +335,21 @@ const GameRoom = () => {
             jugadorActual={jugadorActual}
           />
         )}
+        {/* Chat solo visible cuando la partida está cargada */}
+
+        <GameChat
+          players={partida.jugadors}
+          ws={socket}
+          onSystemMessage={handleSystemMessageRef}
+        />
+        {showCardAnimation && currentCard && (
+          <div className="absolute inset-0 z-50 pointer-events-none">
+            <AnimatedCardFromDeck frontImageUrl={`cards/${currentCard}.png`} />
+          </div>
+        )}
       </GameBoard>
     </div>
   );
 };
+
 export default GameRoom;

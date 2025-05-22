@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Sword, ArrowsClockwise, ShieldCheck, Cards } from "phosphor-react";
 import { SquaresPlusIcon } from "@heroicons/react/24/solid";
+import { toast } from "react-hot-toast";
+import useWebSocket from "../hooks/useWebSocket";
+import CardDeck from "./CardDeck";
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
 const posicioColors = {
@@ -30,9 +33,19 @@ export default function TurnManager({
 }) {
   const posi = jugadores?.find((e) => e.jugador.id === jugador.id)?.posicio;
   const [tiempoRestante, setTiempoRestante] = useState(tiempoTotal);
+  const socket = useWebSocket();
+  const [myId, setMyId] = useState(null);
+  const [isDeckOpen, setIsDeckOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
 
+  // const [selectedCards, setSelectedCards] = useState([]);
+  // const [isTradePopupOpen, setIsTradePopupOpen] = useState(false);
+  // const [cards, setCards] = useState(countries);
   const color = posicioColors[posi] || "#000";
-
+  useEffect(() => {
+    const profileId = parseInt(localStorage.getItem("profile"), 10);
+    setMyId(profileId);
+  }, []);
   useEffect(() => {
     setTiempoRestante(tiempoTotal);
     const timer = setInterval(() => {
@@ -47,10 +60,40 @@ export default function TurnManager({
 
     return () => clearInterval(timer);
   }, [jugador.id, tiempoTotal]);
-
+  useEffect(() => {
+    if (jugador) {
+      toast(`Torn del jugador: ${jugador.nom}, fase de ${fase}`, {
+        duration: 3000,
+        position: "top-center",
+      });
+    }
+  }, [jugador?.id]);
   const porcentaje = (tiempoRestante / tiempoTotal) * 100;
   const isSubFase = subFases.includes(fase);
+  const handleNextFase = () => {
+    if (!jugador || jugador.id !== myId) {
+      return;
+    }
 
+    if (socket?.socket?.readyState === WebSocket.OPEN) {
+      const message = {
+        method: "skipFase",
+        data: {},
+      };
+      socket.socket.send(JSON.stringify(message));
+    }
+  };
+  const toggleDeck = () => {
+    setIsDeckOpen(!isDeckOpen);
+    if (isDeckOpen) {
+      // setSelectedCards([]);
+      // setIsTradePopupOpen(false);
+    }
+  };
+
+  const handleCardClick = (index) => {
+    setSelectedCard(selectedCard === index ? null : index);
+  };
   return (
     <div className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-amber-50/30 backdrop-blur-md shadow-lg rounded-xl p-4 w-52 z-50">
       <div className="text-center text-sm font-semibold text-gray-700 uppercase tracking-wide ">
@@ -107,6 +150,7 @@ export default function TurnManager({
               className="p-1 hover:bg-gray-200 rounded-md transition"
               disabled={!cartas?.length}
               title="Cartas"
+              onClick={toggleDeck}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +180,8 @@ export default function TurnManager({
       {/* Botón de acción */}
       {isSubFase && (
         <button
-          className="w-full py-2 text-white font-semibold rounded-lg shadow"
+          onClick={handleNextFase}
+          className="w-full py-2 text-white font-semibold rounded-lg shadow cursor-pointer"
           style={{
             backgroundColor: color,
           }}
@@ -144,6 +189,12 @@ export default function TurnManager({
           {fase === "Recolocacio" ? "Terminar turno" : "Siguiente"}
         </button>
       )}
+      <CardDeck
+        cards={cartas}
+        isOpen={isDeckOpen}
+        onCardClick={handleCardClick}
+        selectedCard={selectedCard}
+      />
     </div>
   );
 }

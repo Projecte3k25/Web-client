@@ -1,26 +1,33 @@
 import "./css/CardDeck.css";
+const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
+const CardDeck = ({ cards = [], isOpen, onCardClick, selectedCards = [] }) => {
+  const isCardSelected = (card) => {
+    return selectedCards.some(
+      (selectedCard) =>
+        selectedCard.nom === card.nom && selectedCard.tipus === card.tipus
+    );
+  };
 
-const CardDeck = ({ cards = [], isOpen, onCardClick, selectedCard }) => {
   return (
-    <div className="card-deck-container">
+    <div className="card-deck-container left-0">
       {isOpen && (
         <div className="cards-wrapper">
-          {cards.map((country, index) => (
+          {cards.map((card, index) => (
             <div
               key={index}
-              className={`card ${selectedCard === index ? "selected" : ""}`}
+              className={`card ${isCardSelected(card) ? "selected" : ""}`}
               style={{
                 animation: `slide-down 1s ease-in-out ${
                   index * 0.2
                 }s backwards`,
-                rotate: `${-15 + index * 15}deg`,
+                rotate: `${-30 + index * 15}deg`,
                 zIndex: index,
               }}
-              onClick={() => onCardClick(index)}
+              onClick={() => onCardClick(card, index)}
             >
               <img
-                src={`/cards/${country}.png`}
-                alt={country}
+                src={`http://${backendHost}/assets/cards/${card.nom}.png`}
+                alt={card.nom}
                 className="card-image"
               />
             </div>

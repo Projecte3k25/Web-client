@@ -68,7 +68,6 @@ const DiceRoller = ({
 
   return (
     <div id="ui_dado" style={{ "--dice-color": color }}>
-      {/* <p id="result">{result}</p> */}
       <div id="platform" ref={platformRef}>
         <div id="dice" ref={diceRef} onClick={dado}>
           {/* Faces */}

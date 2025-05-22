@@ -11,7 +11,7 @@ svg path:not(.sombra) {
 }
 
 svg path:not(.sombra):hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-1.2px);
   stroke: #2a2a2a;
   stroke-width: 1px;
   filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.7));
@@ -20,4 +20,44 @@ svg path:not(.sombra):hover {
   width: 50px;
   height: 50px;
   position: relative;
+}
+@keyframes pulse {
+  0% {
+    r: 2;
+    opacity: 1;
+  }
+  50% {
+    r: 8;
+    opacity: 0.4;
+  }
+  100% {
+    r: 2;
+    opacity: 1;
+  }
+}
+
+.pulsating {
+  animation: pulse 1s infinite;
+  fill: red !important;
+  pointer-events: none;
+}
+@keyframes pulsate-black {
+  0% {
+    r: 2;
+    opacity: 1;
+  }
+  50% {
+    r: 8;
+    opacity: 0.4;
+  }
+  100% {
+    r: 2;
+    opacity: 1;
+  }
+}
+
+.pulsating-black {
+  animation: pulsate-black 1s infinite;
+  fill: black !important;
+  pointer-events: none;
 }
