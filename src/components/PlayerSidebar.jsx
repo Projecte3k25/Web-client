@@ -13,7 +13,7 @@ const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 const PlayerSidebar = ({ jugadores, jugadorActual }) => {
   return (
     <>
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 p-4 bg-amber-100/40 backdrop-blur-md rounded-l-2xl shadow-xl z-40">
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 p-4 bg-[#2c1810]/90 border-2 border-[#8b4513]  backdrop-blur-md rounded-l-2xl shadow-xl z-40">
         {jugadores.map((jugador) => {
           const isActual = jugador.jugador.id === jugadorActual?.id;
           const borderColor = posicioColors[jugador.posicio] || "#ccc";

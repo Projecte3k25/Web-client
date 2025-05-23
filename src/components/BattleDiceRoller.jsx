@@ -112,8 +112,8 @@ const BattleDiceRoller = ({
         setShowLosses(false);
         setHasRolled(false);
         setRollResults({ red: [], blue: [] });
-      }, 4000);
-    }, 5000); // espera 2s para mostrar pérdidas
+      }, 3000);
+    }, 4000); // espera 2s para mostrar pérdidas
 
     return () => clearTimeout(timeout);
   }, [ultimaAccion]);
@@ -139,8 +139,8 @@ const BattleDiceRoller = ({
   }, [atacanteId, defensorId]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-30 backdrop-blur-sm">
-      <div className="relative flex flex-col items-center gap-6 p-14 bg-black/30 bg-opacity-70 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center  backdrop-blur-sm">
+      <div className="relative flex flex-col items-center gap-6 p-14 bg-[#3b2a1a] border-[#8b4513] border-2  rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-hidden">
         <button
           className="absolute top-4 right-4 text-white font-bold text-xl cursor-pointer hover:text-gray-300 transition-colors"
           onClick={onClose}
@@ -151,7 +151,7 @@ const BattleDiceRoller = ({
         {/* Sliders */}
         <div className="flex gap-10 w-full justify-center">
           <div className="flex flex-col items-center">
-            <label className="font-bold text-white">
+            <label className="font-bold text-[#f4e4bc]">
               Tropas atacantes: {attackerTroops} de {atacanteId}
             </label>
             <input
@@ -160,12 +160,19 @@ const BattleDiceRoller = ({
               max={Math.max(1, realAttackerTroops - 1)}
               value={attackerTroops}
               onChange={(e) => setAttackerTroops(Number(e.target.value))}
-              className="w-48"
+              className="w-48 h-2 rounded-full appearance-none custom-thumb"
+              style={{
+                background: `linear-gradient(to right, #d4af37 ${
+                  ((attackerTroops - 1) /
+                    (Math.max(1, realAttackerTroops - 1) - 1)) *
+                  100
+                }%, #3b2a1a 0%)`,
+              }}
               disabled={conquistado}
             />
           </div>
           <div className="flex flex-col items-center">
-            <label className="font-bold text-white">
+            <label className="font-bold text-[#f4e4bc]">
               Tropas defensoras: {localDefenderTroops} de {defensorId}
             </label>
           </div>
@@ -173,7 +180,7 @@ const BattleDiceRoller = ({
 
         {/* Botón de lanzar */}
         {conquistado ? (
-          <div className="text-yellow-400 text-2xl font-bold mt-2">
+          <div className="text-[#d4af37] text-2xl font-bold mt-2">
             ¡Territorio conquistado!
           </div>
         ) : (
@@ -185,8 +192,8 @@ const BattleDiceRoller = ({
             className={`${
               attackerTroops < 1 || localDefenderTroops < 1 || conquistado
                 ? "bg-gray-500 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            } text-white px-6 py-2 rounded transition`}
+                : " bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a] border-2 rounded-2xl cursor-pointer"
+            } text-[#d4af37]  px-6 py-2 rounded transition`}
           >
             Lanzar dados
           </button>
@@ -225,7 +232,7 @@ const BattleDiceRoller = ({
           </div>
 
           {/* Espadas GIF */}
-          {showGif && (
+          {/* {showGif && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
               <img
                 src={`/effects/swords-crossed.gif?${gifKey}`}
@@ -233,11 +240,11 @@ const BattleDiceRoller = ({
                 className="w-64 h-64 pointer-events-none transition-opacity duration-500"
               />
             </div>
-          )}
+          )} */}
 
           {/* Resultado de pérdidas */}
           {showLosses && (
-            <div className="absolute bottom-30 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-80 text-white px-6 py-3 rounded-xl text-xl font-bold shadow-lg border border-white">
+            <div className="absolute bottom-30 left-1/2 transform -translate-x-1/2 z-50 bg-[#4a2c1a] bg-opacity-80  px-6 py-3 rounded-xl text-xl font-bold shadow-lg border border-[#8b4513]">
               <div className="flex flex-col items-center">
                 {lostTroops.attacker > 0 && (
                   <p className="text-red-400">

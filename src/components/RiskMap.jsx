@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import useWebSocket from "../hooks/useWebSocket";
 import BattleDiceRoller from "./BattleDiceRoller";
 import GameChat from "./GameChat";
-import SVGMap from "./SVGMap";
+
 import TropasModal from "./TropasModal"; // Importamos el modal
 import { toast } from "react-hot-toast";
 
@@ -25,6 +25,7 @@ export default function RiskMap({
   fronteras,
   setTerritorios,
   tropasDisponibles,
+  svgUpdateTrigger,
 }) {
   let selectedTerritorio = null;
 
@@ -452,6 +453,7 @@ export default function RiskMap({
     selectedTerritorioFrom,
     selectedTerritorioTo,
     fromTropas,
+    svgUpdateTrigger,
   ]);
 
   // Manejadores de confirmación para las acciones que involucran el modal
@@ -715,6 +717,7 @@ export default function RiskMap({
     selectedTerritorioTo,
     fromTropas,
     modalOpen,
+    svgUpdateTrigger,
   ]);
 
   // Manejador para el evento de confirmación del modal

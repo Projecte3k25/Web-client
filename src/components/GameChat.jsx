@@ -181,24 +181,24 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       } z-50`}
     >
-      <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white text-sm border border-gray-600">
+      <div className="bg-gradient-to-br from-[#2c1810] to-[#4a2c1a] border-2 border-[#8b4513] rounded-xl p-4 text-[#f4e4bc] shadow-xl text-sm">
         {/* Tabs */}
         <div className="flex space-x-2 mb-2">
           <button
-            className={`px-3 py-1 rounded transition-colors ${
+            className={`px-3 py-1 rounded transition-all text-sm font-semibold border ${
               activeTab === "chat"
-                ? "bg-blue-600/50 text-white"
-                : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/50"
+                ? "bg-gradient-to-r from-[#d4af37] to-[#b8941f] text-[#2c1810] border-[#d4af37]"
+                : "bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a]"
             }`}
             onClick={() => setActiveTab("chat")}
           >
             Chat ({messages.length})
           </button>
           <button
-            className={`px-3 py-1 rounded transition-colors ${
+            className={`px-3 py-1 rounded transition-all text-sm font-semibold border ${
               activeTab === "system"
-                ? "bg-blue-600/50 text-white"
-                : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/50"
+                ? "bg-gradient-to-r from-[#d4af37] to-[#b8941f] text-[#2c1810] border-[#d4af37]"
+                : "bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a]"
             }`}
             onClick={() => setActiveTab("system")}
           >
@@ -207,7 +207,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
         </div>
 
         {/* Mensajes */}
-        <div className="max-h-48 overflow-y-auto mb-2 border-t border-gray-600 pt-2">
+        <div className="max-h-26 overflow-y-auto mb-2 border-t border-gray-600 pt-2">
           {currentMessages.length === 0 ? (
             <p className="text-gray-400 italic text-center py-2">
               {activeTab === "chat"
@@ -219,10 +219,10 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
               if (msg.system || activeTab === "system") {
                 return (
                   <div key={msg.id} className="mb-1">
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-[#a78f60]">
                       [{msg.timestamp}]{" "}
                     </span>
-                    <span className="text-yellow-300">{msg.text}</span>
+                    <span className="text-[#d4af37] italic">{msg.text}</span>
                   </div>
                 );
               }
@@ -243,11 +243,11 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
 
               return (
                 <div key={msg.id} className="mb-1 break-words">
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-[#a78f60]">
                     [{msg.timestamp}]{" "}
                   </span>
                   <strong style={{ color }}>{userData.nom}:</strong>{" "}
-                  <span className="text-gray-100">{msg.message}</span>
+                  <span className="text-[#f4e4bc]">{msg.message}</span>
                 </div>
               );
             })
@@ -259,7 +259,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
         {activeTab === "chat" && (
           <input
             type="text"
-            className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded focus:outline-none focus:border-blue-500 placeholder-gray-400"
+            className="w-full px-2 py-2 bg-[#2c1810] border border-[#8b4513] text-[#f4e4bc] rounded focus:outline-none focus:border-[#d4af37] placeholder-[#8b4513]"
             placeholder="Presiona Enter para escribir..."
             value={input}
             onChange={(e) => setInput(e.target.value)}

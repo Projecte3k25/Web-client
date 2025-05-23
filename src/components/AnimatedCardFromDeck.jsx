@@ -4,16 +4,20 @@ import "./css/AnimatedCardFromDeck.css";
 const AnimatedCardFromDeck = ({ frontImageUrl }) => {
   const [showCard, setShowCard] = useState(false);
   const [flipCard, setFlipCard] = useState(false);
+  const [showFront, setShowFront] = useState(false);
   const [removeCard, setRemoveCard] = useState(false);
 
   useEffect(() => {
     const showTimeout = setTimeout(() => setShowCard(true), 2000);
     const flipTimeout = setTimeout(() => setFlipCard(true), 3000);
+    // Cambiar la imagen exactamente en el punto medio del giro
+    const frontTimeout = setTimeout(() => setShowFront(true), 3400); // 3000 + 400ms (mitad de 800ms)
     const removeTimeout = setTimeout(() => setRemoveCard(true), 5000);
 
     return () => {
       clearTimeout(showTimeout);
       clearTimeout(flipTimeout);
+      clearTimeout(frontTimeout);
       clearTimeout(removeTimeout);
     };
   }, []);
@@ -47,7 +51,7 @@ const AnimatedCardFromDeck = ({ frontImageUrl }) => {
               flipCard ? "deck-card--opened" : "deck-card--down"
             } ${removeCard ? "deck-card--removed" : ""}`}
             style={{
-              backgroundImage: flipCard
+              backgroundImage: showFront
                 ? `url(${frontImageUrl})`
                 : `url(/cards/backCard.png)`,
             }}

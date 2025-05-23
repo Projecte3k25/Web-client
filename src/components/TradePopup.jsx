@@ -70,7 +70,9 @@ const TradePopup = ({
                       onClick={() => removeCard(index)}
                     >
                       <img
-                        src={`/cards/${selectedCards[index].nom}.png`}
+                        src={`http://${
+                          import.meta.env.VITE_BACKEND_HOST_API
+                        }/assets/cards/${selectedCards[index].nom}.png`}
                         alt={selectedCards[index].nom}
                         className="popup-card-image"
                       />

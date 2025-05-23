@@ -9,7 +9,7 @@ import PlayerSidebar from "../components/PlayerSidebar";
 import TurnManager from "../components/TurnManager";
 import GameChat from "../components/GameChat";
 import AnimatedCardFromDeck from "../components/AnimatedCardFromDeck";
-
+const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 const GameRoom = () => {
   const { state } = useLocation();
 
@@ -17,7 +17,7 @@ const GameRoom = () => {
   const partida = state?.partida;
   const game = state?.game;
   const players = state?.players;
-
+  const [svgUpdateTrigger, setSvgUpdateTrigger] = useState(0);
   const [gameData, setGameData] = useState(null);
   const [playersLoaded, setPlayersLoaded] = useState([]);
   const [allLoaded, setAllLoaded] = useState(false);
@@ -137,9 +137,6 @@ const GameRoom = () => {
 
         if (msg.method === "allLoaded") {
           setAllLoaded(true);
-          addSystemMessage(
-            "¡Todos los jugadores están conectados! La partida puede comenzar."
-          );
         }
 
         if (msg.method === "accio") {
@@ -234,15 +231,19 @@ const GameRoom = () => {
           );
         }
         if (msg.method === "robaCarta") {
-          const carta = msg.data.carta;
-          setCurrentCard(carta);
+          const cartaData = msg.data;
+
+          const cardFileName = `${cartaData.nom}`;
+
+          setCurrentCard(cardFileName);
           setShowCardAnimation(true);
 
           // Cerrar la animación después de 4 segundos
           setTimeout(() => {
             setShowCardAnimation(false);
             setCurrentCard(null);
-          }, 5000);
+            setSvgUpdateTrigger((prev) => prev + 1);
+          }, 6000);
         }
       } catch (err) {
         console.error("Error parsing message:", err);
@@ -316,6 +317,7 @@ const GameRoom = () => {
           fronteras={partida.territoris}
           setTerritorios={setTerritorios}
           tropasDisponibles={tropasDisponibles}
+          svgUpdateTrigger={svgUpdateTrigger}
         />
 
         {allLoaded && faseActual && jugadorActual && (
@@ -343,8 +345,14 @@ const GameRoom = () => {
           onSystemMessage={handleSystemMessageRef}
         />
         {showCardAnimation && currentCard && (
-          <div className="absolute inset-0 z-50 pointer-events-none">
-            <AnimatedCardFromDeck frontImageUrl={`cards/${currentCard}.png`} />
+          <div
+            className="fixed inset-0 flex items-center justify-center pointer-events-none"
+            style={{ zIndex: 9999 }}
+          >
+            <AnimatedCardFromDeck
+              frontImageUrl={`http://${backendHost}/assets/cards/${currentCard}.png`}
+              // frontImageUrl={`cards/${currentCard}.png`}
+            />
           </div>
         )}
       </GameBoard>
