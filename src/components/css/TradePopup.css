@@ -273,7 +273,6 @@
   box-shadow: none;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .trade-popup {
     width: 95%;

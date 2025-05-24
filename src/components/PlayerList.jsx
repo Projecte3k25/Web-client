@@ -12,6 +12,9 @@ const PlayerList = ({ players, game }) => {
   const { profile } = useProfile();
   // console.log(players);
   const socket = useWebSocket();
+  const isCustomGame = game?.tipus === "Custom";
+  const isAdmin = game?.admin_id === profile?.id;
+  const canKickPlayers = isCustomGame && isAdmin;
   return (
     <div className="max-h-[500px] overflow-y-auto space-y-2">
       <ul className="space-y-1">
@@ -31,27 +34,26 @@ const PlayerList = ({ players, game }) => {
                   <span className="font-semibold text-lg text-blue-900">
                     {player.nom}
                   </span>
-                  {game?.admin_id === player.id && (
+                  {isCustomGame && player.id === game.admin_id && (
                     <img src="./crown.png" className="h-4 w-6"></img>
                   )}
                 </div>
-                {game?.admin_id === profile?.id &&
-                  player.id !== profile?.id && (
-                    <button
-                      onClick={() =>
-                        socket.send(
-                          JSON.stringify({
-                            method: "kickJugador",
-                            data: { user: player.id },
-                          })
-                        )
-                      }
-                      className="text-red-600 hover:text-red-800 transition"
-                      title="Expulsar jugador"
-                    >
-                      <XCircle className="w-5 h-5" />
-                    </button>
-                  )}
+                {canKickPlayers && player.id !== profile?.id && (
+                  <button
+                    onClick={() =>
+                      socket.send(
+                        JSON.stringify({
+                          method: "kickJugador",
+                          data: { user: player.id },
+                        })
+                      )
+                    }
+                    className="text-red-600 hover:text-red-800 transition"
+                    title="Expulsar jugador"
+                  >
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                )}
               </div>
               <div className="text-sm  text-blue-900">
                 Wins: {player.wins} · Elo: {player.elo}

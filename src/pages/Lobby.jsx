@@ -20,7 +20,10 @@ const Lobby = () => {
   const initialPlayers = location.state?.players || [];
   const [players, setPlayers] = useState(initialPlayers);
   const [game, setGame] = useState(location.state?.game || null);
-
+  const isCustomGame = game?.tipus === "Custom";
+  const isAdmin = game?.admin_id === profile?.id;
+  const shouldShowAdminControls = isCustomGame && isAdmin;
+  console.log(game);
   useEffect(() => {
     if (initialPlayers.length === 0) {
       socket.send(JSON.stringify({ method: "lobby" }));
@@ -90,7 +93,7 @@ const Lobby = () => {
         <div className="flex flex-grow w-full rounded-lg overflow-hidden shadow-lg">
           <div className="w-2/3 p-6 relative">
             <PlayerList players={players} game={game} />
-            {game?.admin_id === profile?.id && (
+            {shouldShowAdminControls && (
               <>
                 <button
                   onClick={handleStartGame}

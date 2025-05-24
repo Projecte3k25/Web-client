@@ -112,8 +112,8 @@ const BattleDiceRoller = ({
         setShowLosses(false);
         setHasRolled(false);
         setRollResults({ red: [], blue: [] });
-      }, 3000);
-    }, 4000); // espera 2s para mostrar pérdidas
+      }, 2000);
+    }, 3000); // espera 2s para mostrar pérdidas
 
     return () => clearTimeout(timeout);
   }, [ultimaAccion]);
@@ -149,8 +149,8 @@ const BattleDiceRoller = ({
         </button>
 
         {/* Sliders */}
-        <div className="flex gap-10 w-full justify-center">
-          <div className="flex flex-col items-center">
+        <div className="flex gap-10 w-full justify-center border-b-2 border-[#8b4513] pb-3">
+          <div className="flex flex-col items-center ">
             <label className="font-bold text-[#f4e4bc]">
               Tropas atacantes: {attackerTroops} de {atacanteId}
             </label>
@@ -160,7 +160,7 @@ const BattleDiceRoller = ({
               max={Math.max(1, realAttackerTroops - 1)}
               value={attackerTroops}
               onChange={(e) => setAttackerTroops(Number(e.target.value))}
-              className="w-48 h-2 rounded-full appearance-none custom-thumb"
+              className="w-48 h-1 rounded-full appearance-none custom-thumb mt-2"
               style={{
                 background: `linear-gradient(to right, #d4af37 ${
                   ((attackerTroops - 1) /
