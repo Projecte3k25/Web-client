@@ -81,14 +81,12 @@ const Home = () => {
     <div className="flex items-center justify-center min-h-screen">
       <Sidebar />
       <Panel>
-        <div className="flex h-130 gap-6">
-          <div className="w-1/3 border-r border-white/30 pr-6">
+        <div className="flex h-full gap-6">
+          <div className="w-1/3 border-r border-white/30 pr-4 overflow-hidden">
             <Ranking ranking={ranking} />
           </div>
-          <div className="w-2/3 pl-6 flex flex-col justify-between">
-            <div>
-              <GameList games={games} />
-            </div>
+          <div className="w-2/3 pl-4 flex flex-col overflow-hidden">
+            <GameList games={games} />
           </div>
         </div>
       </Panel>

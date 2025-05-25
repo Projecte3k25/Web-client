@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 import { useProfile } from "../context/ProfileContext";
 
@@ -15,13 +16,11 @@ const ProfilePopup = ({ onClose }) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validar tipo de archivo
     if (!file.type.startsWith("image/")) {
       setUploadError("Por favor selecciona un archivo de imagen válido");
       return;
     }
 
-    // Validar tamaño (máximo 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setUploadError("La imagen debe ser menor a 5MB");
       return;
@@ -37,23 +36,16 @@ const ProfilePopup = ({ onClose }) => {
       const response = await fetch(`http://${backendHost}/api/profile/avatar`, {
         method: "POST",
         body: formData,
-        credentials: "include", // Si usas cookies para autenticación
+        credentials: "include",
         headers: {
-          // No incluir Content-Type, el browser lo setea automáticamente para FormData
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Si usas JWT
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Error al subir la imagen");
-      }
+      if (!response.ok) throw new Error("Error al subir la imagen");
 
       const data = await response.json();
-
-      // Actualizar el perfil con la nueva imagen
-      if (updateProfile) {
-        updateProfile({ ...profile, avatar: data.avatarPath });
-      }
+      updateProfile?.({ ...profile, avatar: data.avatarPath });
     } catch (error) {
       console.error("Error uploading avatar:", error);
       setUploadError("Error al subir la imagen. Inténtalo de nuevo.");
@@ -62,187 +54,305 @@ const ProfilePopup = ({ onClose }) => {
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+  const triggerFileInput = () => fileInputRef.current?.click();
 
   const winRate =
     profile.games > 0 ? ((profile.wins / profile.games) * 100).toFixed(1) : 0;
 
+  // Variantes de animación
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+        delay: 0.1,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: { ease: "easeIn", duration: 0.15 },
+    },
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: 0.2 + i * 0.05,
+        duration: 0.3,
+      },
+    }),
+  };
+
   return (
-    <div className="fixed inset-0 bg-white/10 border-white/20 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in">
-      <div className="bg-white rounded-2xl p-8 w-96 relative shadow-2xl transform animate-slide-up">
-        {/* Botón cerrar mejorado */}
-        <button
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-600 hover:text-red-500 transition-all duration-200 hover:scale-110"
-          onClick={onClose}
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50"
+        variants={backdropVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
+        <motion.div
+          className="bg-white rounded-2xl p-8 w-96 max-w-[95vw] relative shadow-2xl"
+          variants={modalVariants}
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          {/* Botón cerrar con animación */}
+          <motion.button
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-600 hover:text-red-500 transition-all"
+            onClick={onClose}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-
-        <div className="flex flex-col items-center space-y-6">
-          {/* Avatar con funcionalidad de upload */}
-          <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 p-1">
-              {profile.avatar ? (
-                <img
-                  src={`http://${backendHost}${profile.avatar}`}
-                  alt="Avatar"
-                  className="w-full h-full rounded-full object-cover bg-white"
-                />
-              ) : (
-                <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-2xl font-bold text-gray-400">
-                  {profile.nom?.charAt(0)?.toUpperCase() || "?"}
-                </div>
-              )}
-            </div>
-
-            {/* Overlay para upload */}
-            <div
-              className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
-              onClick={triggerFileInput}
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {isUploading ? (
-                <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-              ) : (
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </motion.button>
+
+          <div className="flex flex-col items-center space-y-6">
+            {/* Avatar con animación */}
+            <motion.div
+              className="relative group"
+              custom={0}
+              variants={contentVariants}
+            >
+              <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 p-1">
+                {profile.avatar ? (
+                  <motion.img
+                    src={`http://${backendHost}${profile.avatar}`}
+                    alt="Avatar"
+                    className="w-full h-full rounded-full object-cover bg-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    key={profile.avatar} // Important for avatar changes
                   />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                ) : (
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-2xl font-bold text-gray-400">
+                    {profile.nom?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                )}
+              </div>
+
+              {/* Overlay para upload */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                onClick={triggerFileInput}
+                whileHover={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+              >
+                {isUploading ? (
+                  <motion.div
+                    className="rounded-full h-6 w-6 border-2 border-white border-t-transparent"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1,
+                      ease: "linear",
+                    }}
                   />
-                </svg>
-              )}
-            </div>
+                ) : (
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                )}
+              </motion.div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </motion.div>
 
-          {/* Error message */}
-          {uploadError && (
-            <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-200">
-              {uploadError}
-            </div>
-          )}
-
-          {/* Nombre del usuario */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              {profile.nom}
-            </h2>
-            <p className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer">
-              Haz clic en tu avatar para cambiarlo
-            </p>
-          </div>
-
-          {/* Estadísticas mejoradas */}
-          <div className="w-full space-y-4">
-            {/* Estadísticas principales */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl text-center border border-blue-200">
-                <div className="text-2xl font-bold text-blue-600">
-                  {profile.games ?? 0}
-                </div>
-                <div className="text-sm text-blue-700">Partidas</div>
-              </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl text-center border border-purple-200">
-                <div className="text-2xl font-bold text-purple-600">
-                  {profile.elo ?? 0}
-                </div>
-                <div className="text-sm text-purple-700">Elo Rating</div>
-              </div>
-            </div>
-
-            {/* Wins/Losses */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg text-center border border-green-200">
-                <div className="text-lg font-semibold text-green-600">
-                  {profile.wins ?? 0}
-                </div>
-                <div className="text-xs text-green-700">Ganadas</div>
-              </div>
-              <div className="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-lg text-center border border-red-200">
-                <div className="text-lg font-semibold text-red-600">
-                  {profile.loses ?? 0}
-                </div>
-                <div className="text-xs text-red-700">Perdidas</div>
-              </div>
-            </div>
-
-            {/* Win Rate */}
-            {profile.games > 0 && (
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg text-center border border-yellow-200">
-                <div className="text-lg font-semibold text-orange-600">
-                  {winRate}%
-                </div>
-                <div className="text-xs text-orange-700">Tasa de Victoria</div>
-              </div>
+            {/* Error message con animación */}
+            {uploadError && (
+              <motion.div
+                className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-200 w-full"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {uploadError}
+              </motion.div>
             )}
+
+            {/* Nombre del usuario */}
+            <motion.div
+              className="text-center"
+              custom={1}
+              variants={contentVariants}
+            >
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                {profile.nom}
+              </h2>
+              <p className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer">
+                Haz clic en tu avatar para cambiarlo
+              </p>
+            </motion.div>
+
+            {/* Estadísticas con animación escalonada */}
+            <motion.div
+              className="w-full space-y-4"
+              custom={2}
+              variants={contentVariants}
+            >
+              {/* Estadísticas principales */}
+              <motion.div
+                className="grid grid-cols-2 gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.1,
+                    },
+                  },
+                }}
+              >
+                {[
+                  {
+                    value: profile.games ?? 0,
+                    label: "Partidas",
+                    color: "blue",
+                  },
+                  {
+                    value: profile.elo ?? 0,
+                    label: "Elo Rating",
+                    color: "purple",
+                  },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 p-4 rounded-xl text-center border border-${stat.color}-200`}
+                    variants={{
+                      hidden: { opacity: 0, y: 10 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    whileHover={{ y: -2 }}
+                  >
+                    <div
+                      className={`text-2xl font-bold text-${stat.color}-600`}
+                    >
+                      {stat.value}
+                    </div>
+                    <div className={`text-sm text-${stat.color}-700`}>
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Wins/Losses */}
+              <motion.div
+                className="grid grid-cols-2 gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.1,
+                    },
+                  },
+                }}
+              >
+                {[
+                  {
+                    value: profile.wins ?? 0,
+                    label: "Ganadas",
+                    color: "green",
+                  },
+                  {
+                    value: profile.loses ?? 0,
+                    label: "Perdidas",
+                    color: "red",
+                  },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 p-3 rounded-lg text-center border border-${stat.color}-200`}
+                    variants={{
+                      hidden: { opacity: 0, y: 10 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    whileHover={{ y: -2 }}
+                  >
+                    <div
+                      className={`text-lg font-semibold text-${stat.color}-600`}
+                    >
+                      {stat.value}
+                    </div>
+                    <div className={`text-xs text-${stat.color}-700`}>
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Win Rate */}
+              {profile.games > 0 && (
+                <motion.div
+                  className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg text-center border border-yellow-200"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  whileHover={{ y: -2 }}
+                >
+                  <div className="text-lg font-semibold text-orange-600">
+                    {winRate}%
+                  </div>
+                  <div className="text-xs text-orange-700">
+                    Tasa de Victoria
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
           </div>
-        </div>
-      </div>
-
-      {/* CSS en línea para las animaciones */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-
-          @keyframes slide-up {
-            from {
-              opacity: 0;
-              transform: translateY(20px) scale(0.95);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0) scale(1);
-            }
-          }
-
-          .animate-fade-in {
-            animation: fade-in 0.2s ease-out;
-          }
-
-          .animate-slide-up {
-            animation: slide-up 0.3s ease-out;
-          }
-        `,
-        }}
-      />
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

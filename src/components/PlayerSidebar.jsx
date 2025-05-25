@@ -12,13 +12,9 @@ const posicioColors = {
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
-const PlayerSidebar = ({ jugadores, jugadorActual }) => {
-  // Encontrar la posición del jugador actual
-  const jugadorActualData = jugadores.find(
-    (j) => j.jugador.id === jugadorActual?.id
-  );
-  const posicionActual = jugadorActualData?.posicio;
-  jugadores.sort(jugadores.posicio);
+const PlayerSidebar = ({ jugadores, posicioActual }) => {
+  jugadores.sort((a, b) => a.posicio - b.posicio);
+
   return (
     <>
       <div className="fixed right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-8 p-4 z-40">
@@ -38,8 +34,9 @@ const PlayerSidebar = ({ jugadores, jugadorActual }) => {
         )}
 
         {/* Avatares */}
-        {jugadores.map((jugador, index) => {
-          const isActual = jugador.posicio === posicionActual;
+        {jugadores.map((jugador) => {
+          const isActual = jugador.posicio === posicioActual;
+
           const borderColor = posicioColors[jugador.posicio] || "#ccc";
 
           return (
@@ -53,7 +50,7 @@ const PlayerSidebar = ({ jugadores, jugadorActual }) => {
                 style={{ borderColor }}
                 className={clsx(
                   "w-16 h-16 rounded-full border-4 transition-all duration-300 object-cover shadow-lg",
-                  isActual ? "animate-gelatine" : "grayscale "
+                  isActual ? "animate-gelatine " : "grayscale "
                 )}
               />
             </div>

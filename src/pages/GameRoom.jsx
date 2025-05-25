@@ -31,8 +31,8 @@ const GameRoom = () => {
   const [ultimaAccion, setUltimaAccion] = useState(null);
   const [showCardAnimation, setShowCardAnimation] = useState(false);
   const [currentCard, setCurrentCard] = useState(null);
-
   const faseRef = useRef(null);
+  const [posicioActual, setposicioActual] = useState(null);
 
   // Referencia para el chat
   const addSystemMessageRef = useRef(null);
@@ -116,6 +116,7 @@ const GameRoom = () => {
           const {
             fase,
             jugadorActual,
+            posicio,
             temps: tiempo,
             territoris: territorios,
             tropas,
@@ -125,6 +126,7 @@ const GameRoom = () => {
           faseRef.current = msg.data.fase;
           setFaseActual(fase);
           setJugadorActual(jugadorActual);
+          setposicioActual(posicio);
           setTropasDisponibles(tropas);
           setCartas(cartas);
           setTiempoTurno(tiempo);
@@ -334,7 +336,7 @@ const GameRoom = () => {
         {allLoaded && faseActual && partida?.jugadors && jugadorActual && (
           <PlayerSidebar
             jugadores={partida.jugadors}
-            jugadorActual={jugadorActual}
+            posicioActual={posicioActual}
           />
         )}
         {/* Chat solo visible cuando la partida está cargada */}
