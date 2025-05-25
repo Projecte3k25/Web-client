@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import "./css/TradePopup.css";
 
 const TradePopup = ({
@@ -7,8 +8,8 @@ const TradePopup = ({
   selectedCards,
   onCardSelect,
   onTrade,
-  mustTrade = false, // Nueva prop para trade obligatorio
-  canTrade = true, // Nueva prop para controlar si se puede hacer trade
+  mustTrade = false,
+  canTrade = true,
 }) => {
   const [canTradeCards, setCanTradeCards] = useState(false);
 
@@ -27,13 +28,8 @@ const TradePopup = ({
     const comodines = types.filter((type) => type === "comodin").length;
     const otherTypes = types.filter((type) => type !== "comodin");
 
-    // Si hay comodines, pueden completar cualquier combinación
     if (comodines > 0) return true;
-
-    // Tres del mismo tipo
     if (new Set(otherTypes).size === 1) return true;
-
-    // Tres tipos diferentes
     if (new Set(otherTypes).size === 3) return true;
 
     return false;
@@ -54,131 +50,189 @@ const TradePopup = ({
   };
 
   const handleClose = () => {
-    // Si es trade obligatorio y no hay cartas suficientes seleccionadas, mostrar advertencia
-    if (mustTrade && selectedCards.length < 3) {
-      // No cerrar el popup
-      return;
-    }
+    if (mustTrade && selectedCards.length < 3) return;
     onClose();
   };
 
   const handleOverlayClick = (e) => {
-    // Si es trade obligatorio, no permitir cerrar haciendo clic fuera
-    if (mustTrade) {
-      return;
-    }
+    if (mustTrade) return;
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="trade-popup-overlay" onClick={handleOverlayClick}>
-      <div className="trade-popup" onClick={(e) => e.stopPropagation()}>
-        <div className="trade-popup-header">
-          {mustTrade && (
-            <div className="mandatory-trade-warning">
-              ⚠️ INTERCAMBIO OBLIGATORIO
-            </div>
-          )}
-          {!canTrade && (
-            <div className="phase-restriction-warning">
-              ⚠️ Solo puedes intercambiar en la fase de Refuerzo de Tropas
-            </div>
-          )}
-        </div>
-
-        <div className="trade-popup-content">
-          <div className="selected-cards-area">
-            <h4>
-              Cartas Seleccionadas:
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="trade-popup-overlay"
+          onClick={handleOverlayClick}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="trade-popup"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: -20, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <motion.div
+              className="trade-popup-header"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               {mustTrade && (
-                <span className="mandatory-indicator"> (Obligatorio)</span>
-              )}
-            </h4>
-            <div className="selected-cards-grid">
-              {Array.from({ length: 3 }, (_, index) => (
-                <div key={index} className="card-slot">
-                  {selectedCards[index] ? (
-                    <div
-                      className="selected-card-item"
-                      onClick={() => removeCard(index)}
-                    >
-                      <img
-                        src={`http://${
-                          import.meta.env.VITE_BACKEND_HOST_API
-                        }/assets/cards/${selectedCards[index].nom}.png`}
-                        alt={selectedCards[index].nom}
-                        className="popup-card-image"
-                      />
-                      <div className="card-details">
-                        <span className="card-name">
-                          {selectedCards[index].nom}
-                        </span>
-                        <span className="card-type">
-                          {selectedCards[index].tipus}
-                        </span>
-                      </div>
-                      <div className="remove-indicator">×</div>
-                    </div>
-                  ) : (
-                    <div className="empty-slot">
-                      <span>Selecciona una carta</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="trade-rules">
-            <h4>Reglas de Intercambio:</h4>
-            <ul>
-              <li>Necesitas exactamente 3 cartas</li>
-              <li>3 cartas del mismo tipo</li>
-              <li>3 cartas de tipos diferentes</li>
-              <li>Los comodines pueden sustituir cualquier tipo</li>
-              {mustTrade && (
-                <li className="mandatory-rule">
-                  ⚠️ Debes intercambiar porque tienes 5+ cartas
-                </li>
+                <motion.div
+                  className="mandatory-trade-warning"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  ⚠️ INTERCAMBIO OBLIGATORIO
+                </motion.div>
               )}
               {!canTrade && (
-                <li className="phase-restriction-rule">
-                  ⚠️ Solo disponible en fase de Refuerzo de Tropas
-                </li>
+                <motion.div
+                  className="phase-restriction-warning"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
+                  ⚠️ Solo puedes intercambiar en la fase de Refuerzo de Tropas
+                </motion.div>
               )}
-            </ul>
-          </div>
+            </motion.div>
 
-          <div className="trade-popup-actions">
-            <button
-              className={`cancel-button ${mustTrade ? "disabled" : ""}`}
-              onClick={handleClose}
-              disabled={mustTrade}
+            <motion.div
+              className="trade-popup-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
             >
-              {mustTrade ? "No puedes cancelar" : "Cancelar"}
-            </button>
-            <button
-              className={`trade-button ${
-                !canTradeCards || !canTrade ? "disabled" : ""
-              } ${mustTrade ? "mandatory" : ""}`}
-              onClick={handleTrade}
-              disabled={!canTradeCards || !canTrade}
-            >
-              {!canTrade
-                ? "No disponible en esta fase"
-                : mustTrade
-                ? "INTERCAMBIAR OBLIGATORIO"
-                : "Intercambiar"}{" "}
-              ({selectedCards.length}/3)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <motion.div
+                className="selected-cards-area"
+                initial={{ y: 10 }}
+                animate={{ y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <h4>
+                  Cartas Seleccionadas:
+                  {mustTrade && (
+                    <span className="mandatory-indicator"> (Obligatorio)</span>
+                  )}
+                </h4>
+                <div className="selected-cards-grid">
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <motion.div
+                      key={index}
+                      className="card-slot"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
+                    >
+                      {selectedCards[index] ? (
+                        <motion.div
+                          className="selected-card-item"
+                          onClick={() => removeCard(index)}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <img
+                            src={`http://${
+                              import.meta.env.VITE_BACKEND_HOST_API
+                            }/assets/cards/${selectedCards[index].nom}.png`}
+                            alt={selectedCards[index].nom}
+                            className="popup-card-image"
+                          />
+                          <div className="card-details">
+                            <span className="card-name">
+                              {selectedCards[index].nom}
+                            </span>
+                            <span className="card-type">
+                              {selectedCards[index].tipus}
+                            </span>
+                          </div>
+                          <div className="remove-indicator">×</div>
+                        </motion.div>
+                      ) : (
+                        <div className="empty-slot">
+                          <span>Selecciona una carta</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="trade-rules"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <h4>Reglas de Intercambio:</h4>
+                <ul>
+                  <li>Necesitas exactamente 3 cartas</li>
+                  <li>3 cartas del mismo tipo</li>
+                  <li>3 cartas de tipos diferentes</li>
+                  <li>Los comodines pueden sustituir cualquier tipo</li>
+                  {mustTrade && (
+                    <li className="mandatory-rule">
+                      ⚠️ Debes intercambiar porque tienes 5+ cartas
+                    </li>
+                  )}
+                  {!canTrade && (
+                    <li className="phase-restriction-rule">
+                      ⚠️ Solo disponible en fase de Refuerzo de Tropas
+                    </li>
+                  )}
+                </ul>
+              </motion.div>
+
+              <motion.div
+                className="trade-popup-actions"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <motion.button
+                  className={`cancel-button ${mustTrade ? "disabled" : ""}`}
+                  onClick={handleClose}
+                  disabled={mustTrade}
+                  whileHover={mustTrade ? {} : { scale: 1.03 }}
+                  whileTap={mustTrade ? {} : { scale: 0.98 }}
+                >
+                  {mustTrade ? "No puedes cancelar" : "Cancelar"}
+                </motion.button>
+                <motion.button
+                  className={`trade-button ${
+                    !canTradeCards || !canTrade ? "disabled" : ""
+                  } ${mustTrade ? "mandatory" : ""}`}
+                  onClick={handleTrade}
+                  disabled={!canTradeCards || !canTrade}
+                  whileHover={
+                    !canTradeCards || !canTrade ? {} : { scale: 1.03 }
+                  }
+                  whileTap={!canTradeCards || !canTrade ? {} : { scale: 0.98 }}
+                >
+                  {!canTrade
+                    ? "No disponible en esta fase"
+                    : mustTrade
+                    ? "INTERCAMBIAR OBLIGATORIO"
+                    : "Intercambiar"}{" "}
+                  ({selectedCards.length}/3)
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

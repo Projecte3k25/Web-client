@@ -26,7 +26,8 @@ const CardDeck = ({ cards = [], isOpen, onCardClick, selectedCards = [] }) => {
               onClick={() => onCardClick(card, index)}
             >
               <img
-                src={`http://${backendHost}/assets/cards/${card.nom}.png`}
+                // src={`http://${backendHost}/assets/cards/${card.nom}.png`}
+                src={`./cards/${card.nom}.png`}
                 alt={card.nom}
                 className="card-image"
               />

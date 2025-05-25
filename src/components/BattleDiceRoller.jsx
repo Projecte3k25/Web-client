@@ -203,7 +203,7 @@ const BattleDiceRoller = ({
         <div className="flex items-center justify-center gap-10 mt-4 relative">
           {/* Soldado atacante */}
           <img
-            src={`http://${backendHost}/assets/tropas/ataquer${attackerImageIndex}.png`}
+            src={`./tropas/ataquer${attackerImageIndex}.png`}
             alt="Atacante"
             className={`w-64 h-64 transition-transform duration-700 ${
               troopAnimation ? "scale-125 -translate-x-12" : ""
@@ -283,7 +283,7 @@ const BattleDiceRoller = ({
 
           {/* Soldado defensor */}
           <img
-            src={`http://${backendHost}/assets/tropas/defender${defenderImageIndex}.png`}
+            src={`./tropas/defender${defenderImageIndex}.png`}
             alt="Defensor"
             className={`w-64 h-64 transition-transform duration-700 ${
               troopAnimation ? "scale-125 translate-x-12" : ""

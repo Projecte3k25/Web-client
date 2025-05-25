@@ -4,6 +4,38 @@ import { useProfile } from "../context/ProfileContext";
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
+// Objeto de colores para evitar interpolación dinámica de clases
+const colorMap = {
+  blue: {
+    bgFrom: "from-blue-50",
+    bgTo: "to-blue-100",
+    border: "border-blue-200",
+    text: "text-blue-600",
+    textSecondary: "text-blue-700",
+  },
+  purple: {
+    bgFrom: "from-purple-50",
+    bgTo: "to-purple-100",
+    border: "border-purple-200",
+    text: "text-purple-600",
+    textSecondary: "text-purple-700",
+  },
+  green: {
+    bgFrom: "from-green-50",
+    bgTo: "to-green-100",
+    border: "border-green-200",
+    text: "text-green-600",
+    textSecondary: "text-green-700",
+  },
+  red: {
+    bgFrom: "from-red-50",
+    bgTo: "to-red-100",
+    border: "border-red-200",
+    text: "text-red-600",
+    textSecondary: "text-red-700",
+  },
+};
+
 const ProfilePopup = ({ onClose }) => {
   const { profile, updateProfile } = useProfile();
   const [isUploading, setIsUploading] = useState(false);
@@ -98,6 +130,41 @@ const ProfilePopup = ({ onClose }) => {
     }),
   };
 
+  // Componente reutilizable para estadísticas
+  const StatCard = ({ value, label, color }) => {
+    const colors = colorMap[color] || colorMap.blue;
+    return (
+      <motion.div
+        className={`bg-gradient-to-br ${colors.bgFrom} ${colors.bgTo} p-4 rounded-xl text-center border ${colors.border}`}
+        variants={{
+          hidden: { opacity: 0, y: 10 },
+          visible: { opacity: 1, y: 0 },
+        }}
+        whileHover={{ y: -2 }}
+      >
+        <div className={`text-2xl font-bold ${colors.text}`}>{value}</div>
+        <div className={`text-sm ${colors.textSecondary}`}>{label}</div>
+      </motion.div>
+    );
+  };
+
+  const SmallStatCard = ({ value, label, color }) => {
+    const colors = colorMap[color] || colorMap.blue;
+    return (
+      <motion.div
+        className={`bg-gradient-to-br ${colors.bgFrom} ${colors.bgTo} p-3 rounded-lg text-center border ${colors.border}`}
+        variants={{
+          hidden: { opacity: 0, y: 10 },
+          visible: { opacity: 1, y: 0 },
+        }}
+        whileHover={{ y: -2 }}
+      >
+        <div className={`text-lg font-semibold ${colors.text}`}>{value}</div>
+        <div className={`text-xs ${colors.textSecondary}`}>{label}</div>
+      </motion.div>
+    );
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -149,7 +216,7 @@ const ProfilePopup = ({ onClose }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    key={profile.avatar} // Important for avatar changes
+                    key={profile.avatar}
                   />
                 ) : (
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-2xl font-bold text-gray-400">
@@ -252,37 +319,16 @@ const ProfilePopup = ({ onClose }) => {
                   },
                 }}
               >
-                {[
-                  {
-                    value: profile.games ?? 0,
-                    label: "Partidas",
-                    color: "blue",
-                  },
-                  {
-                    value: profile.elo ?? 0,
-                    label: "Elo Rating",
-                    color: "purple",
-                  },
-                ].map((stat, i) => (
-                  <motion.div
-                    key={i}
-                    className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 p-4 rounded-xl text-center border border-${stat.color}-200`}
-                    variants={{
-                      hidden: { opacity: 0, y: 10 },
-                      visible: { opacity: 1, y: 0 },
-                    }}
-                    whileHover={{ y: -2 }}
-                  >
-                    <div
-                      className={`text-2xl font-bold text-${stat.color}-600`}
-                    >
-                      {stat.value}
-                    </div>
-                    <div className={`text-sm text-${stat.color}-700`}>
-                      {stat.label}
-                    </div>
-                  </motion.div>
-                ))}
+                <StatCard
+                  value={profile.games ?? 0}
+                  label="Partidas"
+                  color="blue"
+                />
+                <StatCard
+                  value={profile.elo ?? 0}
+                  label="Elo Rating"
+                  color="purple"
+                />
               </motion.div>
 
               {/* Wins/Losses */}
@@ -298,37 +344,16 @@ const ProfilePopup = ({ onClose }) => {
                   },
                 }}
               >
-                {[
-                  {
-                    value: profile.wins ?? 0,
-                    label: "Ganadas",
-                    color: "green",
-                  },
-                  {
-                    value: profile.loses ?? 0,
-                    label: "Perdidas",
-                    color: "red",
-                  },
-                ].map((stat, i) => (
-                  <motion.div
-                    key={i}
-                    className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 p-3 rounded-lg text-center border border-${stat.color}-200`}
-                    variants={{
-                      hidden: { opacity: 0, y: 10 },
-                      visible: { opacity: 1, y: 0 },
-                    }}
-                    whileHover={{ y: -2 }}
-                  >
-                    <div
-                      className={`text-lg font-semibold text-${stat.color}-600`}
-                    >
-                      {stat.value}
-                    </div>
-                    <div className={`text-xs text-${stat.color}-700`}>
-                      {stat.label}
-                    </div>
-                  </motion.div>
-                ))}
+                <SmallStatCard
+                  value={profile.wins ?? 0}
+                  label="Ganadas"
+                  color="green"
+                />
+                <SmallStatCard
+                  value={profile.loses ?? 0}
+                  label="Perdidas"
+                  color="red"
+                />
               </motion.div>
 
               {/* Win Rate */}

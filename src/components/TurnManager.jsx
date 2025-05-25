@@ -64,7 +64,7 @@ export default function TurnManager({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [jugador.id, tiempoTotal]);
+  }, [tiempoTotal]);
 
   useEffect(() => {
     if (jugador) {

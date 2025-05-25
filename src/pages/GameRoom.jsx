@@ -352,8 +352,8 @@ const GameRoom = () => {
             style={{ zIndex: 9999 }}
           >
             <AnimatedCardFromDeck
-              frontImageUrl={`http://${backendHost}/assets/cards/${currentCard}.png`}
-              // frontImageUrl={`cards/${currentCard}.png`}
+              // frontImageUrl={`http://${backendHost}/assets/cards/${currentCard}.png`}
+              frontImageUrl={`cards/${currentCard}.png`}
             />
           </div>
         )}

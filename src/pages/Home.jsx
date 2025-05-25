@@ -39,7 +39,7 @@ const Home = () => {
     const handleMessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-
+        console.log(message);
         if (message.method === "getPartidas") {
           setGames(message.data);
         } else if (message.method === "lobby") {
