@@ -134,7 +134,7 @@ const CreateGameModal = ({ onClose }) => {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-600">
+                <label className="text-sm font-light text-gray-900">
                   Nombre de la partida
                 </label>
                 <input
@@ -148,7 +148,7 @@ const CreateGameModal = ({ onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-600">
+                <label className="text-sm font-light text-gray-900">
                   Máximo de jugadores
                 </label>
                 <input

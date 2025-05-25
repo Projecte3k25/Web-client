@@ -13,7 +13,7 @@ const posicioColors = {
   3: "#FFEB3B",
   4: "#9C27B0",
   5: "#FF9800",
-  6: "#c81d11",
+  6: "#008080",
 };
 
 const faseIcons = {
@@ -42,6 +42,7 @@ export default function TurnManager({
   const [selectedCards, setSelectedCards] = useState([]);
   const [isTradePopupOpen, setIsTradePopupOpen] = useState(false);
   const [cards, setCards] = useState(cartas || []);
+  const [mustTrade, setMustTrade] = useState(false); // Nuevo estado para trade obligatorio
 
   const color = posicioColors[posi] || "#000";
 
@@ -81,11 +82,44 @@ export default function TurnManager({
     }
   }, [cartas]);
 
+  // Verificar si debe hacer trade obligatorio
+  useEffect(() => {
+    if (jugador?.id === myId && fase === "ReforçTropes" && cards.length >= 5) {
+      setMustTrade(true);
+      // Abrir automáticamente el deck si tiene 5+ cartas en ReforçTropes
+      if (!isDeckOpen) {
+        setIsDeckOpen(true);
+      }
+
+      toast.error("¡Debes intercambiar cartas! Tienes 5 o más cartas.", {
+        duration: 5000,
+        position: "top-center",
+      });
+    } else {
+      setMustTrade(false);
+    }
+  }, [jugador?.id, myId, fase, cards.length, isDeckOpen]);
+
   const porcentaje = (tiempoRestante / tiempoTotal) * 100;
   const isSubFase = subFases.includes(fase);
 
+  // Verificar si puede hacer trade (solo en ReforçTropes)
+  const canTrade = fase === "ReforçTropes";
+
   const handleNextFase = () => {
     if (!jugador || jugador.id !== myId) {
+      return;
+    }
+
+    // Si debe hacer trade obligatorio, no permitir avanzar
+    if (mustTrade) {
+      toast.error(
+        "Debes intercambiar cartas antes de continuar. Tienes 5 o más cartas.",
+        {
+          duration: 4000,
+          position: "top-center",
+        }
+      );
       return;
     }
 
@@ -189,9 +223,23 @@ export default function TurnManager({
     setCards(remainingCards);
     setSelectedCards([]);
     setIsTradePopupOpen(false);
+
+    // Verificar si aún debe hacer trade después del intercambio
+    if (remainingCards.length < 5) {
+      setMustTrade(false);
+    }
   };
 
   const closeTradePopup = () => {
+    // Si debe hacer trade obligatorio, no permitir cerrar el popup
+    if (mustTrade && selectedCards.length < 3) {
+      toast.error("Debes seleccionar 3 cartas para intercambiar", {
+        duration: 3000,
+        position: "top-center",
+      });
+      return;
+    }
+
     setIsTradePopupOpen(false);
     setSelectedCards([]);
   };
@@ -252,21 +300,16 @@ export default function TurnManager({
 
           {/* Botón de cartas */}
           {isSubFase && (
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1 relative group">
               <button
-                className={` rounded-md transition ${
+                className={`rounded-md transition ${
                   jugador.id === myId
                     ? `hover:bg-gray-200 cursor-pointer ${
                         isDeckOpen ? "bg-gray-200" : ""
-                      }`
+                      } ${mustTrade ? "animate-pulse bg-red-200" : ""}`
                     : "cursor-not-allowed opacity-60"
                 }`}
                 disabled={!cards?.length || jugador.id !== myId}
-                title={
-                  jugador.id !== myId
-                    ? "Solo el propietario puede ver sus cartas"
-                    : `Cartas (${cards?.length || 0})`
-                }
                 onClick={toggleDeck}
               >
                 <svg
@@ -278,31 +321,58 @@ export default function TurnManager({
                     cards?.length > 0 && jugador.id === myId
                       ? "grayscale-0"
                       : "grayscale opacity-40"
-                  }`}
+                  } ${mustTrade ? "drop-shadow-lg" : ""}`}
                 >
                   <path d="M12 8h40v48H12z" opacity="0.3" />
                   <path
                     d="M10 6h44v52H10z"
-                    stroke="#000"
+                    stroke={mustTrade ? "#dc2626" : "#000"}
                     strokeWidth="2"
-                    fill="#d4af37"
+                    fill={mustTrade ? "#fca5a5" : "#d4af37"}
                   />
                   <path d="M20 12h24v8H20z" fill="#2c1810" />
                   <circle cx="32" cy="40" r="6" fill="#2c1810" />
                 </svg>
               </button>
-              <span className="text-[10px] text-[#f4e4bc]/60 font-medium">
+
+              <span
+                className={`text-[10px] font-medium ${
+                  mustTrade ? "text-red-400 animate-pulse" : "text-[#f4e4bc]/60"
+                }`}
+              >
                 {jugador.id === myId ? cards?.length || 0 : "?"}
               </span>
+
+              {/* Tooltip estilo cómic */}
+              <div className="absolute bottom-[110%] left-1/2 -translate-x-1/2 px-2 py-1 bg-yellow-100 text-black text-[10px] rounded shadow border border-yellow-300 opacity-0 group-hover:opacity-100 pointer-events-none transition z-10 whitespace-nowrap">
+                {jugador.id !== myId
+                  ? "Solo el propietario puede ver sus cartas"
+                  : mustTrade
+                  ? "¡Debes intercambiar cartas!"
+                  : `Cartas: ${cards?.length || 0}`}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-yellow-100 rotate-45 border-l border-b border-yellow-300" />
+              </div>
             </div>
           )}
         </div>
+
+        {/* Mensaje de trade obligatorio */}
+        {mustTrade && jugador.id === myId && (
+          <div className="mb-2 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 text-center">
+            ¡Debes intercambiar cartas!
+          </div>
+        )}
 
         {/* Botón de acción */}
         {isSubFase && (
           <button
             onClick={handleNextFase}
-            className="w-full py-2 bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a] border-2 rounded-2xl cursor-pointer"
+            disabled={mustTrade}
+            className={`w-full py-2 border-2 rounded-2xl transition ${
+              mustTrade
+                ? "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                : "bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a] cursor-pointer"
+            }`}
           >
             {fase === "Recolocacio" ? "Terminar turno" : "Siguiente"}
           </button>
@@ -332,6 +402,8 @@ export default function TurnManager({
             selectedCards={selectedCards}
             onCardSelect={handleCardSelect}
             onTrade={handleTrade}
+            mustTrade={mustTrade}
+            canTrade={canTrade} // Pasar si puede hacer trade
           />
         </>
       )}

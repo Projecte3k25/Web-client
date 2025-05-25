@@ -2,12 +2,12 @@ import React from "react";
 import clsx from "clsx";
 
 const posicioColors = {
-  1: "#00913f", // verde
-  2: "#2196F3", // azul
-  3: "#FFEB3B", // amarillo
-  4: "#9C27B0", // morado
-  5: "#FF9800", // naranja
-  6: "#c81d11", // rojo
+  1: "#00913f",
+  2: "#2196F3",
+  3: "#FFEB3B",
+  4: "#9C27B0",
+  5: "#FF9800",
+  6: "#008080",
 };
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;

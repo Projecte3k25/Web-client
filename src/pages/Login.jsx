@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
-
+import Panel from "../components/Panel";
+const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 const Login = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +30,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
       console.log(backendHost);
       const response = await fetch(`http://${backendHost}/api/usuaris/login`, {
         method: "POST",
@@ -56,37 +56,233 @@ const Login = () => {
     }
   };
 
+  const handleDiscordClick = () => {
+    // Reemplaza con el enlace de invitación de tu servidor de Discord
+    const discordInvite = "https://discord.gg/HBJKArd8";
+    window.open(discordInvite, "_blank");
+  };
+
+  const handlePdfClick = () => {
+    // Reemplaza con la ruta a tu archivo PDF
+    const pdfUrl = `http://${backendHost}/assets/documents/Risk-Game.pdf`;
+    window.open(pdfUrl, "_blank");
+  };
+
   return (
-    <div className="login-box">
-      <h2 className="text-3xl bold">Login</h2>
-      <div id="face">{face}</div>
-      <form id="loginForm" onSubmit={handleSubmit}>
-        <div className="input-box">
-          <input
-            type="text"
-            id="username"
-            value={login}
-            onChange={handleInputChange}
-            required
-          />
-          <label>Username</label>
+    <Panel className="flex justify-center items-center">
+      <div style={styles.container}>
+        <div style={styles.loginBox}>
+          <h2 style={styles.title}>Login</h2>
+          <div style={styles.face}>{face}</div>
+          <div onSubmit={handleSubmit}>
+            <div style={styles.inputBox}>
+              <input
+                type="text"
+                id="username"
+                value={login}
+                onChange={handleInputChange}
+                style={styles.input}
+                required
+              />
+              <label
+                style={{
+                  ...styles.label,
+                  ...(login ? styles.labelActive : {}),
+                }}
+              >
+                Username
+              </label>
+            </div>
+            <div style={styles.inputBox}>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={handleInputChange}
+                style={styles.input}
+                required
+              />
+              <label
+                style={{
+                  ...styles.label,
+                  ...(password ? styles.labelActive : {}),
+                }}
+              >
+                Password
+              </label>
+            </div>
+            <button
+              onClick={handleSubmit}
+              style={{
+                ...styles.loginBtn,
+                ...(login && password
+                  ? styles.loginBtnEnabled
+                  : styles.loginBtnDisabled),
+              }}
+              disabled={!(login && password)}
+            >
+              Login
+            </button>
+          </div>
         </div>
-        <div className="input-box">
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handleInputChange}
-            required
-          />
-          <label>Password</label>
+
+        {/* Botones mejorados fuera del login box */}
+        <div style={styles.additionalButtons}>
+          <button
+            type="button"
+            onClick={handleDiscordClick}
+            style={styles.discordBtn}
+            onMouseEnter={(e) =>
+              (e.target.style.transform = "translateY(-2px)")
+            }
+            onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
+          >
+            <img src="./discord.png" alt="discord" className="pl-2" />
+            Unete a la comunidad
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePdfClick}
+            style={styles.pdfBtn}
+            onMouseEnter={(e) =>
+              (e.target.style.transform = "translateY(-2px)")
+            }
+            onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
+          >
+            <img src="./pdf.png" alt="pdf" className="pl-2" />
+            Guia Risk
+          </button>
         </div>
-        <button type="submit" id="loginBtn" disabled={!(login && password)}>
-          Login
-        </button>
-      </form>
-    </div>
+      </div>
+    </Panel>
   );
+};
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "100vh",
+    padding: "20px",
+  },
+  loginBox: {
+    background: "rgba(255, 255, 255, 0.05)",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
+    backdropFilter: "blur(8px)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    width: "400px",
+    maxWidth: "90vw",
+    textAlign: "center",
+    animation: "fadeIn 1.2s ease",
+    position: "relative",
+    marginBottom: "10px",
+  },
+  title: {
+    color: "white",
+    marginBottom: "10px",
+    fontSize: "2rem",
+    fontWeight: "bold",
+  },
+  face: {
+    fontSize: "3rem",
+    marginBottom: "20px",
+    transition: "0.3s ease",
+  },
+  inputBox: {
+    position: "relative",
+    marginBottom: "30px",
+  },
+  input: {
+    width: "100%",
+    padding: "12px 10px",
+    background: "transparent",
+    border: "none",
+    borderBottom: "2px solid white",
+    outline: "none",
+    color: "white",
+    fontSize: "1rem",
+    boxSizing: "border-box",
+  },
+  label: {
+    position: "absolute",
+    left: "10px",
+    top: "12px",
+    color: "white",
+    pointerEvents: "none",
+    transition: "0.3s ease",
+    fontSize: "1rem",
+  },
+  labelActive: {
+    top: "-12px",
+    left: "5px",
+    fontSize: "0.8rem",
+    color: "#00ffe5",
+  },
+  loginBtn: {
+    width: "100%",
+    padding: "12px",
+    border: "none",
+    outline: "none",
+    fontWeight: "bold",
+    borderRadius: "25px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    position: "relative",
+    fontSize: "1rem",
+  },
+  loginBtnEnabled: {
+    background: "#00ffe5",
+    color: "black",
+    boxShadow: "0 0 10px #00ffe5, 0 0 40px rgba(0, 255, 229, 0.3)",
+  },
+  loginBtnDisabled: {
+    background: "#888",
+    color: "#ccc",
+    cursor: "not-allowed",
+  },
+  additionalButtons: {
+    display: "flex",
+    gap: "15px",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+  discordBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#5865F2",
+    color: "white",
+    border: "none",
+    padding: "6px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "600",
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 15px rgba(88, 101, 242, 0.3)",
+    minWidth: "120px",
+  },
+  pdfBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#DC3545",
+    color: "white",
+    border: "none",
+    padding: "6px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "600",
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 15px rgba(220, 53, 69, 0.3)",
+    minWidth: "120px",
+  },
 };
 
 export default Login;

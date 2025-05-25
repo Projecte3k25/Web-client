@@ -22,8 +22,8 @@ const AppWrapper = ({ children }) => {
 
     // 🔌 Si estamos en login, desconectamos el socket
     if (isLoginRoute) {
-      if (ws.socket) {
-        ws.disconnect();
+      if (ws.socket?.readyState === WebSocket.OPEN) {
+        ws.socket.close();
       }
       return;
     }
@@ -99,7 +99,12 @@ const AppWrapper = ({ children }) => {
     };
 
     ws.socket.addEventListener("message", handleMessage);
-    return () => ws.socket.removeEventListener("message", handleMessage);
+    return () => {
+      // Verificar que ws.socket sigue existiendo antes de remover el listener
+      if (ws.socket) {
+        ws.socket.removeEventListener("message", handleMessage);
+      }
+    };
   }, [ws.socket]);
 
   return <ProfileProvider>{children}</ProfileProvider>;

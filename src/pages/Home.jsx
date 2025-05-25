@@ -16,13 +16,32 @@ const Home = () => {
   const [showReconnectModal, setShowReconnectModal] = useState(false);
   const [ranking, setRanking] = useState([]);
 
+  // Solicitar datos iniciales cuando el componente se monta
+  useEffect(() => {
+    if (ws.socket && ws.socket.readyState === WebSocket.OPEN) {
+      // Solicitar ranking
+      const rankingMessage = JSON.stringify({
+        method: "getRanking",
+        data: {},
+      });
+      ws.send(rankingMessage);
+
+      // Solicitar partidas
+      const gamesMessage = JSON.stringify({
+        method: "getPartidas",
+        data: {},
+      });
+      ws.send(gamesMessage);
+    }
+  }, [ws.socket, ws.send]);
+
   useEffect(() => {
     const handleMessage = (event) => {
       try {
         const message = JSON.parse(event.data);
 
         if (message.method === "getPartidas") {
-          setGames(message.data); // o usa tu handler si prefieres
+          setGames(message.data);
         } else if (message.method === "lobby") {
           const { jugadors, partida } = message.data || {};
           navigate("/lobby", {
@@ -51,7 +70,7 @@ const Home = () => {
     return () => {
       ws.socket?.removeEventListener("message", handleMessage);
     };
-  }, [ws.socket]);
+  }, [ws.socket, navigate, setProfile]);
 
   const handleIgnore = () => {
     setShowReconnectModal(false);

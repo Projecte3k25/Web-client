@@ -7,14 +7,16 @@ const TradePopup = ({
   selectedCards,
   onCardSelect,
   onTrade,
+  mustTrade = false, // Nueva prop para trade obligatorio
+  canTrade = true, // Nueva prop para controlar si se puede hacer trade
 }) => {
-  const [canTrade, setCanTrade] = useState(false);
+  const [canTradeCards, setCanTradeCards] = useState(false);
 
   useEffect(() => {
     if (selectedCards.length === 3) {
-      setCanTrade(isValidTrade(selectedCards));
+      setCanTradeCards(isValidTrade(selectedCards));
     } else {
-      setCanTrade(false);
+      setCanTradeCards(false);
     }
   }, [selectedCards]);
 
@@ -38,7 +40,7 @@ const TradePopup = ({
   };
 
   const handleTrade = () => {
-    if (canTrade) {
+    if (canTrade && canTradeCards) {
       onTrade(selectedCards);
       onClose();
     }
@@ -51,16 +53,51 @@ const TradePopup = ({
     onCardSelect(newSelectedCards);
   };
 
+  const handleClose = () => {
+    // Si es trade obligatorio y no hay cartas suficientes seleccionadas, mostrar advertencia
+    if (mustTrade && selectedCards.length < 3) {
+      // No cerrar el popup
+      return;
+    }
+    onClose();
+  };
+
+  const handleOverlayClick = (e) => {
+    // Si es trade obligatorio, no permitir cerrar haciendo clic fuera
+    if (mustTrade) {
+      return;
+    }
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="trade-popup-overlay" onClick={onClose}>
+    <div className="trade-popup-overlay" onClick={handleOverlayClick}>
       <div className="trade-popup" onClick={(e) => e.stopPropagation()}>
-        <div className="trade-popup-header"></div>
+        <div className="trade-popup-header">
+          {mustTrade && (
+            <div className="mandatory-trade-warning">
+              ⚠️ INTERCAMBIO OBLIGATORIO
+            </div>
+          )}
+          {!canTrade && (
+            <div className="phase-restriction-warning">
+              ⚠️ Solo puedes intercambiar en la fase de Refuerzo de Tropas
+            </div>
+          )}
+        </div>
 
         <div className="trade-popup-content">
           <div className="selected-cards-area">
-            <h4>Cartas Seleccionadas:</h4>
+            <h4>
+              Cartas Seleccionadas:
+              {mustTrade && (
+                <span className="mandatory-indicator"> (Obligatorio)</span>
+              )}
+            </h4>
             <div className="selected-cards-grid">
               {Array.from({ length: 3 }, (_, index) => (
                 <div key={index} className="card-slot">
@@ -103,25 +140,40 @@ const TradePopup = ({
               <li>3 cartas del mismo tipo</li>
               <li>3 cartas de tipos diferentes</li>
               <li>Los comodines pueden sustituir cualquier tipo</li>
+              {mustTrade && (
+                <li className="mandatory-rule">
+                  ⚠️ Debes intercambiar porque tienes 5+ cartas
+                </li>
+              )}
+              {!canTrade && (
+                <li className="phase-restriction-rule">
+                  ⚠️ Solo disponible en fase de Refuerzo de Tropas
+                </li>
+              )}
             </ul>
           </div>
 
-          {/* {selectedCards.length === 3 && (
-            <div className={` ${canTrade ? "valid" : "invalid"}`}>
-              {canTrade ? "✓ Combinación válida" : "✗ Combinación inválida"}
-            </div>
-          )} */}
-
           <div className="trade-popup-actions">
-            <button className="cancel-button" onClick={onClose}>
-              Cancelar
+            <button
+              className={`cancel-button ${mustTrade ? "disabled" : ""}`}
+              onClick={handleClose}
+              disabled={mustTrade}
+            >
+              {mustTrade ? "No puedes cancelar" : "Cancelar"}
             </button>
             <button
-              className={`trade-button ${!canTrade ? "disabled" : ""}`}
+              className={`trade-button ${
+                !canTradeCards || !canTrade ? "disabled" : ""
+              } ${mustTrade ? "mandatory" : ""}`}
               onClick={handleTrade}
-              disabled={!canTrade}
+              disabled={!canTradeCards || !canTrade}
             >
-              Intercambiar ({selectedCards.length}/3)
+              {!canTrade
+                ? "No disponible en esta fase"
+                : mustTrade
+                ? "INTERCAMBIAR OBLIGATORIO"
+                : "Intercambiar"}{" "}
+              ({selectedCards.length}/3)
             </button>
           </div>
         </div>

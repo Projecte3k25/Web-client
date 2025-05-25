@@ -23,7 +23,7 @@ const Lobby = () => {
   const isCustomGame = game?.tipus === "Custom";
   const isAdmin = game?.admin_id === profile?.id;
   const shouldShowAdminControls = isCustomGame && isAdmin;
-  console.log(game);
+  // console.log(game);
   useEffect(() => {
     if (initialPlayers.length === 0) {
       socket.send(JSON.stringify({ method: "lobby" }));

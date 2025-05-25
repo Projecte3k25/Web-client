@@ -70,8 +70,8 @@ const ProfilePopup = ({ onClose }) => {
     profile.games > 0 ? ((profile.wins / profile.games) * 100).toFixed(1) : 0;
 
   return (
-    <div className="fixed inset-0  bg-white/10 border-white/20 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-white rounded-2xl p-8 w-96 relative shadow-2xl transform animate-slideUp">
+    <div className="fixed inset-0 bg-white/10 border-white/20 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in">
+      <div className="bg-white rounded-2xl p-8 w-96 relative shadow-2xl transform animate-slide-up">
         {/* Botón cerrar mejorado */}
         <button
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-600 hover:text-red-500 transition-all duration-200 hover:scale-110"
@@ -212,35 +212,36 @@ const ProfilePopup = ({ onClose }) => {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
+      {/* CSS en línea para las animaciones */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
           }
-          to {
-            opacity: 1;
-          }
-        }
 
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
+          @keyframes slide-up {
+            from {
+              opacity: 0;
+              transform: translateY(20px) scale(0.95);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+
+          .animate-fade-in {
+            animation: fade-in 0.2s ease-out;
           }
-        }
 
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-
-        .animate-slideUp {
-          animation: slideUp 0.3s ease-out;
-        }
-      `}</style>
+          .animate-slide-up {
+            animation: slide-up 0.3s ease-out;
+          }
+        `,
+        }}
+      />
     </div>
   );
 };
