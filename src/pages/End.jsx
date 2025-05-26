@@ -1,11 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
-
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
-const EndGameScreen = ({ ranking, currentPlayerId }) => {
+const EndGameScreen = () => {
+  const { state } = useLocation();
   const navigate = useNavigate();
+  const ranking = state?.ranking;
+  const currentPlayerId = state?.currentPlayerId;
+
   // Encontrar la posición y datos del jugador actual
   const currentPlayer = ranking.find(
     (player) => player.jugador.id === currentPlayerId

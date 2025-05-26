@@ -15,64 +15,6 @@ import { Toaster } from "react-hot-toast";
 import GameRoom from "./pages/GameRoom.jsx";
 import EndGameScreen from "./pages/End.jsx";
 
-const mockRanking = [
-  {
-    jugador: {
-      id: "1",
-      nom: "Lucía",
-      avatar: "/avatars/lucia.png",
-      wins: 12,
-      games: 18,
-      elo: 1430,
-    },
-    eloChange: +32,
-  },
-  {
-    jugador: {
-      id: "2",
-      nom: "Carlos",
-      avatar: "/avatars/carlos.png",
-      wins: 10,
-      games: 18,
-      elo: 1390,
-    },
-    eloChange: +15,
-  },
-  {
-    jugador: {
-      id: "3",
-      nom: "Marta",
-      avatar: "/avatars/marta.png",
-      wins: 9,
-      games: 18,
-      elo: 1370,
-    },
-    eloChange: -10,
-  },
-  {
-    jugador: {
-      id: "4",
-      nom: "Tú",
-      avatar: "/avatars/tu.png",
-      wins: 8,
-      games: 18,
-      elo: 1350,
-    },
-    eloChange: -25,
-  },
-  {
-    jugador: {
-      id: "5",
-      nom: "Leo",
-      avatar: "/avatars/leo.png",
-      wins: 6,
-      games: 18,
-      elo: 1300,
-    },
-    eloChange: +5,
-  },
-];
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <WebSocketProvider>
@@ -114,12 +56,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/endtest"
-              element={
-                <EndGameScreen ranking={mockRanking} currentPlayerId="4" />
-              }
-            />
+
             <Route path="/test" element={<Test />} />
           </Routes>
         </AppWrapper>

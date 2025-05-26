@@ -256,8 +256,8 @@ const GameRoom = () => {
         }
 
         if (msg.method === "partidaTerminada") {
-          const ranking = msg.data.ranking;
-          if (ranking && ranking.length > 0) {
+          const ranking = msg.data;
+          if (Array.isArray(ranking) && ranking.length > 0) {
             navigate("/end", {
               state: {
                 ranking,
