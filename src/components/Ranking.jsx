@@ -53,15 +53,15 @@ const Ranking = ({ ranking }) => {
   return (
     <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
       <motion.h3
-        className="text-2xl  text-gray-950 text-center font-bold mb-4 pb-2 border-b border-white/20"
+        className="text-4xl text-center text-black pb-3.5 border-b border-white/20"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        Ranking ELO
+        Ranking de ELO
       </motion.h3>
 
-      {/* Podio minimalista para los primeros 3 */}
+      {/* Podio  */}
       {topThree.length > 0 && (
         <motion.div
           className="flex justify-between items-end gap-2 mb-6 mt-15 h-24"

@@ -31,9 +31,9 @@ const Sidebar = () => {
           <button title="Perfil" onClick={() => setShowProfile(true)}>
             <User className="text-gray-800 hover:text-green-400 transition-all cursor-pointer" />
           </button>
-          <button title="Config">
+          {/* <button title="Config">
             <Settings className="text-gray-800 hover:text-yellow-400 transition-all cursor-pointer" />
-          </button>
+          </button> */}
         </div>
 
         <button title="Logout" onClick={logout}>

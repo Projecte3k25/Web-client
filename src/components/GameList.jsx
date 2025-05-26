@@ -76,7 +76,7 @@ const GameList = ({ games = [] }) => {
   return (
     <div className="max-h-[500px] min-h-[500px] overflow-y-auto space-y-2 relative">
       <h3 className="text-4xl text-center text-black pb-3.5">
-        Partidas disponibles
+        Partides disponibles
       </h3>
 
       <motion.ul
@@ -114,7 +114,7 @@ const GameList = ({ games = [] }) => {
                   {game.nom}
                 </span>
                 <span className="text-sm font-bold text-black group-hover:text-black transition-colors duration-300 drop-shadow-md">
-                  Jugadores en lobby: {game.current_players}/{game.max_players}
+                  Jugadors a la sala: {game.current_players}/{game.max_players}
                 </span>
               </div>
 
@@ -165,7 +165,7 @@ const GameList = ({ games = [] }) => {
               >
                 <h2 className="text-lg font-bold">Partida privada</h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  Introduce la contraseña para unirte.
+                  Introdueix la contrasenya.
                 </p>
               </motion.div>
 
@@ -229,7 +229,7 @@ const GameList = ({ games = [] }) => {
           whileHover={{ scale: 1.05, boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }}
           whileTap={{ scale: 0.98 }}
         >
-          Crear nueva partida
+          Crear nova partida
         </motion.button>
       </div>
 

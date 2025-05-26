@@ -214,8 +214,8 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
           {currentMessages.length === 0 ? (
             <p className="text-gray-400 italic text-center py-2">
               {activeTab === "chat"
-                ? "No hay mensajes"
-                : "No hay acciones registradas"}
+                ? "No hi ha missatges"
+                : "No hi ha accions registrades"}
             </p>
           ) : (
             currentMessages.map((msg) => {
@@ -239,7 +239,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
                         nom: p.jugador.nom,
                         posicio: p.posicio,
                       }
-                    : { nom: `Usuario${msg.user}`, posicio: null };
+                    : { nom: `Usuari${msg.user}`, posicio: null };
                 })();
 
               const color = posicioColors[userData.posicio] || "#ccc";
@@ -263,7 +263,8 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
           <input
             type="text"
             className="w-full px-2 py-2 bg-[#2c1810] border border-[#8b4513] text-[#f4e4bc] rounded focus:outline-none focus:border-[#d4af37] placeholder-[#8b4513]"
-            placeholder="Presiona Enter para escribir..."
+            placeholder="Presiona Enter par escriure
+..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onFocus={resetHideTimer}

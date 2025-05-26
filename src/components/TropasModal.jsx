@@ -44,17 +44,17 @@ export default function TropasModal({
   const getDescripcionAccion = () => {
     return mode === "reforc" ? (
       <div className="text-center">
-        Asignar <span className="font-bold text-amber-400">{valor}</span> nuevas
-        tropas
+        Assignar <span className="font-bold text-amber-400">{valor}</span> noves
+        tropes
       </div>
     ) : (
       <div className="space-y-2 text-sm text-right">
         <div>
-          Quedan en <span className="text-yellow-300">{territorioFrom}</span>:{" "}
+          Queden en <span className="text-yellow-300">{territorioFrom}</span>:{" "}
           <span className="font-bold">{fromTropas - valor}</span>
         </div>
         <div>
-          Recibe <span className="text-blue-400">{territorioTo}</span>:{" "}
+          Rep <span className="text-blue-400">{territorioTo}</span>:{" "}
           <span className="font-bold">{valor}</span>
         </div>
       </div>

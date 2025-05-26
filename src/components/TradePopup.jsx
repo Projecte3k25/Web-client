@@ -93,7 +93,7 @@ const TradePopup = ({
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 500 }}
                 >
-                  ⚠️ INTERCAMBIO OBLIGATORIO
+                  ⚠️ INTERCANVI OBLIGATORI
                 </motion.div>
               )}
               {!canTrade && (
@@ -103,7 +103,7 @@ const TradePopup = ({
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 500 }}
                 >
-                  ⚠️ Solo puedes intercambiar en la fase de Refuerzo de Tropas
+                  ⚠️ Només pots intercanviar en la fase de Reforç de Tropes
                 </motion.div>
               )}
             </motion.div>
@@ -121,9 +121,9 @@ const TradePopup = ({
                 transition={{ delay: 0.3 }}
               >
                 <h4>
-                  Cartas Seleccionadas:
+                  Cartes Seleccionades:
                   {mustTrade && (
-                    <span className="mandatory-indicator"> (Obligatorio)</span>
+                    <span className="mandatory-indicator"> (Obligatori)</span>
                   )}
                 </h4>
                 <div className="selected-cards-grid">
@@ -173,20 +173,20 @@ const TradePopup = ({
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <h4>Reglas de Intercambio:</h4>
+                <h4>Regles d'Intercanvi:</h4>
                 <ul>
-                  <li>Necesitas exactamente 3 cartas</li>
-                  <li>3 cartas del mismo tipo</li>
-                  <li>3 cartas de tipos diferentes</li>
-                  <li>Los comodines pueden sustituir cualquier tipo</li>
+                  <li>Necessites exactament 3 cartes</li>
+                  <li>3 cartes del mateix tipus</li>
+                  <li>3 cartes de tipus diferents</li>
+                  <li>Els comodins poden substituir qualsevol tipus</li>
                   {mustTrade && (
                     <li className="mandatory-rule">
-                      ⚠️ Debes intercambiar porque tienes 5+ cartas
+                      ⚠️ Has d'intercanviar perquè tens 5+ cartes
                     </li>
                   )}
                   {!canTrade && (
                     <li className="phase-restriction-rule">
-                      ⚠️ Solo disponible en fase de Refuerzo de Tropas
+                      ⚠️ Només disponible en fase de Reforç de Tropes
                     </li>
                   )}
                 </ul>
@@ -219,10 +219,10 @@ const TradePopup = ({
                   whileTap={!canTradeCards || !canTrade ? {} : { scale: 0.98 }}
                 >
                   {!canTrade
-                    ? "No disponible en esta fase"
+                    ? "No disponible en aquesta fase"
                     : mustTrade
-                    ? "INTERCAMBIAR OBLIGATORIO"
-                    : "Intercambiar"}{" "}
+                    ? "INTERCANVIAR OBLIGATORI"
+                    : "Intercanviar"}{" "}
                   ({selectedCards.length}/3)
                 </motion.button>
               </motion.div>

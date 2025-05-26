@@ -14,7 +14,6 @@ const posicioColors = {
 const LoadingScreen = ({ players, gameName, loadedIds }) => {
   const [pulse, setPulse] = useState(false);
 
-  // Efecto de pulso para el texto de espera
   useEffect(() => {
     const interval = setInterval(() => {
       setPulse((prev) => !prev);
@@ -38,7 +37,7 @@ const LoadingScreen = ({ players, gameName, loadedIds }) => {
         animate={{ opacity: pulse ? 0.8 : 1 }}
         transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
       >
-        Esperando a que todos los jugadores carguen...
+        Esperant que tots els jugadors carreguin...
       </motion.p>
 
       <div className="w-full max-w-md space-y-3">
@@ -98,7 +97,7 @@ const LoadingScreen = ({ players, gameName, loadedIds }) => {
                     >
                       ✅
                     </motion.span>
-                    <span className="ml-1">Listo</span>
+                    <span className="ml-1">READY</span>
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -107,7 +106,6 @@ const LoadingScreen = ({ players, gameName, loadedIds }) => {
         })}
       </div>
 
-      {/* Barra de progreso decorativa */}
       <motion.div
         className="mt-8 w-full max-w-md h-1 bg-gray-800 rounded-full overflow-hidden"
         initial={{ opacity: 0 }}

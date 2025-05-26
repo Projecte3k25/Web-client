@@ -88,10 +88,13 @@ export default function TurnManager({
       if (!isDeckOpen) {
         setIsDeckOpen(true);
       }
-      toast.error("¡Debes intercambiar cartas! Tienes 5 o más cartas.", {
-        duration: 5000,
-        position: "top-center",
-      });
+      toast.error(
+        "Has d'intercanviar cartes abans de continuar. Tens 5 o més cartes.",
+        {
+          duration: 5000,
+          position: "top-center",
+        }
+      );
     } else {
       setMustTrade(false);
     }
@@ -104,7 +107,7 @@ export default function TurnManager({
     if (!isMyTurn) return;
     if (mustTrade) {
       toast.error(
-        "Debes intercambiar cartas antes de continuar. Tienes 5 o más cartas.",
+        "Has d'intercanviar cartes abans de continuar. Tens 5 o més cartes.",
         {
           duration: 4000,
           position: "top-center",
@@ -172,7 +175,7 @@ export default function TurnManager({
     }
 
     toast.success(
-      `¡Intercambio exitoso! Cartas intercambiadas: ${tradedCards
+      `¡Intercanvi exitos! Cartes intercanviades: ${tradedCards
         .map((c) => c.nom)
         .join(", ")}`,
       {
@@ -200,7 +203,7 @@ export default function TurnManager({
 
   const closeTradePopup = () => {
     if (mustTrade && selectedCards.length < 3) {
-      toast.error("Debes seleccionar 3 cartas para intercambiar", {
+      toast.error("Has de seleccionar 3 cartes per a intercanviar", {
         duration: 3000,
         position: "top-center",
       });
@@ -259,7 +262,7 @@ export default function TurnManager({
             <div className="flex flex-col">
               <span className="font-medium text-[#d4af37]">{jugador.nom}</span>
               <span className="text-sm text-[#f4e4bc]/60">
-                Tropas: {tropasDisponibles}
+                Tropes: {tropasDisponibles}
               </span>
             </div>
           </div>
@@ -311,10 +314,10 @@ export default function TurnManager({
 
               <div className="absolute bottom-[110%] left-1/2 -translate-x-1/2 px-2 py-1 bg-yellow-100 text-black text-[10px] rounded shadow border border-yellow-300 opacity-0 group-hover:opacity-100 pointer-events-none transition z-10 whitespace-nowrap">
                 {!isMyTurn
-                  ? "Solo el propietario puede ver sus cartas"
+                  ? "Només el propietari pot veure les seves cartes"
                   : mustTrade
-                  ? "¡Debes intercambiar cartas!"
-                  : `Cartas: ${cards?.length || 0}`}
+                  ? "¡Has d'intercanviar cartes!"
+                  : `Cartes: ${cards?.length || 0}`}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-yellow-100 rotate-45 border-l border-b border-yellow-300" />
               </div>
             </div>
@@ -324,7 +327,7 @@ export default function TurnManager({
         {/* Mensaje de trade obligatorio */}
         {mustTrade && isMyTurn && (
           <div className="mb-2 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 text-center">
-            ¡Debes intercambiar cartas!
+            ¡Has d'intercanviar cartes!
           </div>
         )}
 
@@ -343,14 +346,14 @@ export default function TurnManager({
             whileHover={isMyTurn && !mustTrade ? { scale: 1.02 } : {}}
             whileTap={isMyTurn && !mustTrade ? { scale: 0.98 } : {}}
           >
-            {fase === "Recolocacio" ? "Terminar turno" : "Siguiente"}
+            {fase === "Recolocacio" ? "Terminar torn" : "Següent"}
           </motion.button>
         )}
 
         {/* Contador de cartas seleccionadas */}
         {selectedCards.length > 0 && isMyTurn && (
           <div className="mt-2 text-xs text-center text-gray-600">
-            Seleccionadas: {selectedCards.length}/3
+            Seleccionades: {selectedCards.length}/3
           </div>
         )}
       </div>

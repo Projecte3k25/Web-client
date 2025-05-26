@@ -33,13 +33,13 @@ const EditGameModal = ({ game, onClose }) => {
         className="bg-white p-6 rounded-xl shadow-xl space-y-4 w-96"
       >
         <h2 className="text-xl font-bold text-center text-gray-800">
-          Crear nueva partida
+          Editar partida
         </h2>
 
         <input
           type="text"
           className="w-full p-2 border border-gray-300 rounded text-black"
-          placeholder="Nombre de la partida"
+          placeholder="Nom de la partida"
           value={nom}
           onChange={(e) => setNom(e.target.value)}
           required
@@ -50,7 +50,7 @@ const EditGameModal = ({ game, onClose }) => {
           min={2}
           max={6}
           className="w-full p-2 border border-gray-300 rounded text-black"
-          placeholder="Máximo de jugadores"
+          placeholder="Màxim de jugadors"
           value={maxPlayers}
           onChange={(e) => setMaxPlayers(Number(e.target.value))}
           required
@@ -69,7 +69,7 @@ const EditGameModal = ({ game, onClose }) => {
           <input
             type="password"
             className="w-full p-2 border border-gray-300 rounded text-black"
-            placeholder="Contraseña"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

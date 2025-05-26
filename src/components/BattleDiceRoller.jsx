@@ -152,7 +152,7 @@ const BattleDiceRoller = ({
         <div className="flex gap-10 w-full justify-center border-b-2 border-[#8b4513] pb-3">
           <div className="flex flex-col items-center ">
             <label className="font-bold text-[#f4e4bc]">
-              Tropas atacantes: {attackerTroops} de {atacanteId}
+              Tropes atacants: {attackerTroops} de {atacanteId}
             </label>
             <input
               type="range"
@@ -173,7 +173,7 @@ const BattleDiceRoller = ({
           </div>
           <div className="flex flex-col items-center">
             <label className="font-bold text-[#f4e4bc]">
-              Tropas defensoras: {localDefenderTroops} de {defensorId}
+              Tropes defensores: {localDefenderTroops} de {defensorId}
             </label>
           </div>
         </div>
@@ -181,7 +181,7 @@ const BattleDiceRoller = ({
         {/* Botón de lanzar */}
         {conquistado ? (
           <div className="text-[#d4af37] text-2xl font-bold mt-2">
-            ¡Territorio conquistado!
+            ¡Territori conquistat!
           </div>
         ) : (
           <button
@@ -195,7 +195,7 @@ const BattleDiceRoller = ({
                 : " bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a] border-2 rounded-2xl cursor-pointer"
             } text-[#d4af37]  px-6 py-2 rounded transition`}
           >
-            Lanzar dados
+            Llançar daus
           </button>
         )}
 
@@ -248,12 +248,12 @@ const BattleDiceRoller = ({
               <div className="flex flex-col items-center">
                 {lostTroops.attacker > 0 && (
                   <p className="text-red-400">
-                    Atacante pierde -{lostTroops.attacker}
+                    Atacant perd -{lostTroops.attacker}
                   </p>
                 )}
                 {lostTroops.defender > 0 && (
                   <p className="text-blue-400">
-                    Defensor pierde -{lostTroops.defender}
+                    Defensor perd -{lostTroops.defender}
                   </p>
                 )}
               </div>

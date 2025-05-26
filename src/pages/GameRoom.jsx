@@ -144,7 +144,7 @@ const GameRoom = () => {
         if (msg.method === "allLoaded") {
           setAllLoaded(true);
         }
-        if (msg.method === "trade") {
+        if (msg.method === "tradeCards") {
           const { tropas, territorios: territoriosACanjear } = msg.data;
           const playerName = getPlayerName(msg.data.jugadorId || jugadorActual);
 
@@ -250,12 +250,9 @@ const GameRoom = () => {
 
         // Manejar otros eventos del juego
         if (msg.method === "jugadorEliminado") {
-          const playerName = getPlayerName(msg.data.jugadorId);
+          setFueEliminado(true);
 
-          if (msg.data.jugadorId === profileId) {
-            setFueEliminado(true);
-          }
-          addSystemMessage(`${playerName} ha sido eliminado de la partida`);
+          addSystemMessage(`Jugador ha sido eliminado de la partida`);
         }
 
         if (msg.method === "partidaTerminada") {
@@ -429,12 +426,12 @@ const GameRoom = () => {
                       </svg>
                     </div>
                     <h2 className="text-2xl font-bold text-white">
-                      Has sido eliminado
+                      Has estat eliminat
                     </h2>
                   </div>
 
                   <p className="text-gray-300 mb-6">
-                    ¿Quieres quedarte como espectador o salir al inicio?
+                    Vols quedar-te com a espectador o sortir a l'inici?
                   </p>
 
                   <div className="flex justify-end gap-3">
@@ -444,7 +441,7 @@ const GameRoom = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Quedarme como espectador
+                      Quedar-me com a espectador
                     </motion.button>
                     <motion.button
                       className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-medium transition-colors"
@@ -452,7 +449,7 @@ const GameRoom = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Salir al inicio
+                      Anar al home
                     </motion.button>
                   </div>
                 </div>

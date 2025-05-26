@@ -52,7 +52,7 @@ const Login = () => {
     } catch (error) {
       console.error(error);
       setFace("😢");
-      alert("Login failed. Please check your credentials.");
+      alert("Revisa les credencials");
     }
   };
 
@@ -121,7 +121,7 @@ const Login = () => {
               }}
               disabled={!(login && password)}
             >
-              Login
+              Entrar
             </button>
           </div>
         </div>
@@ -138,7 +138,7 @@ const Login = () => {
             onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
           >
             <img src="./discord.png" alt="discord" className="pl-2" />
-            Unete a la comunidad
+            Uneix-te a la comunitat
           </button>
 
           <button
@@ -151,7 +151,7 @@ const Login = () => {
             onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
           >
             <img src="./pdf.png" alt="pdf" className="pl-2" />
-            Guia Risk
+            Manual del RISK GAME
           </button>
         </div>
       </div>
@@ -164,12 +164,11 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "start",
     minHeight: "100vh",
     padding: "20px",
   },
   loginBox: {
-    background: "rgba(255, 255, 255, 0.05)",
     padding: "30px",
     borderRadius: "15px",
     boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
@@ -180,7 +179,7 @@ const styles = {
     textAlign: "center",
     animation: "fadeIn 1.2s ease",
     position: "relative",
-    marginBottom: "10px",
+    marginBottom: "20px",
   },
   title: {
     color: "white",

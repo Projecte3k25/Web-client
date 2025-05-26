@@ -113,7 +113,7 @@ const CreateGameModal = ({ onClose }) => {
                     animate={{ y: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    Crear Nueva Partida
+                    Crear nova partida
                   </motion.h2>
                   <motion.p
                     className="text-gray-500 text-sm font-light"
@@ -121,7 +121,7 @@ const CreateGameModal = ({ onClose }) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    Selecciona el tipo de partida
+                    Selecciona el tipus de partida
                   </motion.p>
                 </div>
 
@@ -221,7 +221,7 @@ const CreateGameModal = ({ onClose }) => {
                     initial={{ y: -10 }}
                     animate={{ y: 0 }}
                   >
-                    Partida Personalizada
+                    Partida Personalitzada
                   </motion.h2>
                   <motion.p
                     className="text-gray-500 text-sm font-light"
@@ -229,7 +229,7 @@ const CreateGameModal = ({ onClose }) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.1 }}
                   >
-                    Configura tu partida
+                    Configura la partida
                   </motion.p>
                 </div>
 
@@ -241,7 +241,7 @@ const CreateGameModal = ({ onClose }) => {
                 >
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-900">
-                      Nombre de la partida
+                      Nom de la partida
                     </label>
                     <motion.input
                       type="text"
@@ -259,7 +259,7 @@ const CreateGameModal = ({ onClose }) => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-900">
-                      Máximo de jugadores
+                      Màxim de jugadors
                     </label>
                     <motion.input
                       type="number"
@@ -319,7 +319,7 @@ const CreateGameModal = ({ onClose }) => {
                         transition={{ duration: 0.2 }}
                       >
                         <label className="text-sm font-semibold text-gray-600">
-                          Contraseña
+                          Contrasenya
                         </label>
                         <motion.input
                           type="password"
@@ -351,7 +351,7 @@ const CreateGameModal = ({ onClose }) => {
                     whileHover="hover"
                     whileTap="tap"
                   >
-                    Atrás
+                    Tornar
                   </motion.button>
                   <motion.button
                     onClick={handleCustomSubmit}

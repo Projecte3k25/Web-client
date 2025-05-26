@@ -90,7 +90,7 @@ const LobbyChat = ({ players }) => {
       className="max-h-[500px] overflow-y-auto space-y-2"
       style={{ padding: "20px" }}
     >
-      <h2 className="text-2xl text-center">Lobby Chat</h2>
+      <h2 className="text-2xl text-center">Xat de Sala</h2>
       <div className="border border-gray-300 p-3 h-[300px] overflow-y-scroll">
         {messages.map((msg, i) => {
           if (msg.system) {
