@@ -14,8 +14,8 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
   const [messages, setMessages] = useState([]);
   const [systemMessages, setSystemMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat"); // "chat" | "system"
+  const [isVisible, setIsVisible] = useState(true);
+  const [activeTab, setActiveTab] = useState("chat");
   const [userCache, setUserCache] = useState({});
   const hideTimeoutRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -28,7 +28,9 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
       .toString(36)
       .substr(2, 9)}`;
   };
-
+  useEffect(() => {
+    resetHideTimer();
+  }, []);
   const showChat = () => {
     setIsVisible(true);
     resetHideTimer();
@@ -115,6 +117,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
       try {
         const data = JSON.parse(rawData);
         if (data.method === "chat") {
+          showChat();
           const userId = data.data.user;
 
           // Cachear información del usuario
@@ -179,7 +182,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     <div
       className={`fixed top-2 left-2 w-[250px] transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-      } z-50`}
+      } z-40`}
     >
       <div className="bg-gradient-to-br from-[#2c1810] to-[#4a2c1a] border-2 border-[#8b4513] rounded-xl p-4 text-[#f4e4bc] shadow-xl text-sm">
         {/* Tabs */}

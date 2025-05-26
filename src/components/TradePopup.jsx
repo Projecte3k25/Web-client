@@ -143,9 +143,7 @@ const TradePopup = ({
                           whileTap={{ scale: 0.98 }}
                         >
                           <img
-                            src={`http://${
-                              import.meta.env.VITE_BACKEND_HOST_API
-                            }/assets/cards/${selectedCards[index].nom}.png`}
+                            src={`./cards/${selectedCards[index].nom}.png`}
                             alt={selectedCards[index].nom}
                             className="popup-card-image"
                           />

@@ -9,12 +9,16 @@ import PlayerSidebar from "../components/PlayerSidebar";
 import TurnManager from "../components/TurnManager";
 import GameChat from "../components/GameChat";
 import AnimatedCardFromDeck from "../components/AnimatedCardFromDeck";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 const GameRoom = () => {
   const { state } = useLocation();
-
+  const [fueEliminado, setFueEliminado] = useState(false);
+  const navigate = useNavigate();
   const socket = useWebSocket();
   const partida = state?.partida;
+  const profileId = parseInt(localStorage.getItem("profile"), 10);
   const game = state?.game;
   const players = state?.players;
   const [svgUpdateTrigger, setSvgUpdateTrigger] = useState(0);
@@ -54,8 +58,8 @@ const GameRoom = () => {
   // Función para generar mensaje del sistema basado en la acción
   const generateSystemMessage = (accion) => {
     // Usar el jugador actual si no hay posición específica en la acción
-    const playerId = accion.jugadorId || jugadorActual;
-    const playerName = getPlayerName(playerId);
+
+    const playerName = getPlayerName(accion.jugadorId);
 
     switch (accion.tipo) {
       case "Colocacio":
@@ -140,6 +144,30 @@ const GameRoom = () => {
         if (msg.method === "allLoaded") {
           setAllLoaded(true);
         }
+        if (msg.method === "trade") {
+          const { tropas, territorios: territoriosACanjear } = msg.data;
+          const playerName = getPlayerName(msg.data.jugadorId || jugadorActual);
+
+          const message = `${playerName} ha hecho un canje y ha recibido ${tropas}`;
+
+          addSystemMessage(message);
+
+          setTropasDisponibles((prev) => prev + tropas);
+          setTerritorios((prevTerritorios) => {
+            const actualizados = { ...prevTerritorios };
+
+            territoriosACanjear.forEach((territorioId) => {
+              if (actualizados[territorioId]) {
+                actualizados[territorioId] = {
+                  ...actualizados[territorioId],
+                  tropas: actualizados[territorioId].tropas + 2,
+                };
+              }
+            });
+
+            return actualizados;
+          });
+        }
 
         if (msg.method === "accio") {
           let nuevaAccion = null;
@@ -223,14 +251,23 @@ const GameRoom = () => {
         // Manejar otros eventos del juego
         if (msg.method === "jugadorEliminado") {
           const playerName = getPlayerName(msg.data.jugadorId);
+
+          if (msg.data.jugadorId === profileId) {
+            setFueEliminado(true);
+          }
           addSystemMessage(`${playerName} ha sido eliminado de la partida`);
         }
 
         if (msg.method === "partidaTerminada") {
-          const winnerName = getPlayerName(msg.data.ganador);
-          addSystemMessage(
-            `¡Partida terminada! ${winnerName} ha ganado la partida`
-          );
+          const ranking = msg.data.ranking;
+          if (ranking && ranking.length > 0) {
+            navigate("/end", {
+              state: {
+                ranking,
+                currentPlayerId: profileId,
+              },
+            });
+          }
         }
         if (msg.method === "robaCarta") {
           const cartaData = msg.data;
@@ -356,6 +393,75 @@ const GameRoom = () => {
               frontImageUrl={`cards/${currentCard}.png`}
             />
           </div>
+        )}
+        {fueEliminado && (
+          <AnimatePresence>
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ backgroundColor: "rgba(0,0,0,0)" }}
+              animate={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+              exit={{ backgroundColor: "rgba(0,0,0,0)" }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl shadow-2xl border border-gray-700 w-full max-w-md overflow-hidden"
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="bg-red-500/20 p-2 rounded-full mr-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8 text-red-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">
+                      Has sido eliminado
+                    </h2>
+                  </div>
+
+                  <p className="text-gray-300 mb-6">
+                    ¿Quieres quedarte como espectador o salir al inicio?
+                  </p>
+
+                  <div className="flex justify-end gap-3">
+                    <motion.button
+                      className="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                      onClick={() => setFueEliminado(false)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Quedarme como espectador
+                    </motion.button>
+                    <motion.button
+                      className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-medium transition-colors"
+                      onClick={() => navigate("/home")}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Salir al inicio
+                    </motion.button>
+                  </div>
+                </div>
+
+                {/* Efecto decorativo */}
+                <div className="h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
         )}
       </GameBoard>
     </div>

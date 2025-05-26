@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Sword, ArrowsClockwise, ShieldCheck, Cards } from "phosphor-react";
-import { SquaresPlusIcon } from "@heroicons/react/24/solid";
+import { motion } from "framer-motion";
+import { Sword, ArrowsClockwise, ShieldCheck } from "phosphor-react";
 import { toast } from "react-hot-toast";
 import useWebSocket from "../hooks/useWebSocket";
 import CardDeck from "./CardDeck";
-import TradePopup from "./TradePopup"; // Importar TradePopup
+import TradePopup from "./TradePopup";
+
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
 const posicioColors = {
@@ -37,14 +38,14 @@ export default function TurnManager({
   const socket = useWebSocket();
   const [myId, setMyId] = useState(null);
   const [isDeckOpen, setIsDeckOpen] = useState(false);
-
-  // Estados para el sistema de cartas
   const [selectedCards, setSelectedCards] = useState([]);
   const [isTradePopupOpen, setIsTradePopupOpen] = useState(false);
   const [cards, setCards] = useState(cartas || []);
-  const [mustTrade, setMustTrade] = useState(false); // Nuevo estado para trade obligatorio
+  const [mustTrade, setMustTrade] = useState(false);
 
   const color = posicioColors[posi] || "#000";
+  const isMyTurn = jugador?.id === myId;
+  const isSubFase = subFases.includes(fase);
 
   useEffect(() => {
     const profileId = parseInt(localStorage.getItem("profile"), 10);
@@ -69,28 +70,24 @@ export default function TurnManager({
   useEffect(() => {
     if (jugador) {
       toast(`Torn del jugador: ${jugador.nom}, fase de ${fase}`, {
-        duration: 3000,
+        duration: 2000,
         position: "top-center",
       });
     }
   }, [jugador?.id]);
 
-  // Actualizar cards cuando cambie cartas
   useEffect(() => {
     if (cartas) {
       setCards(cartas);
     }
   }, [cartas]);
 
-  // Verificar si debe hacer trade obligatorio
   useEffect(() => {
-    if (jugador?.id === myId && fase === "ReforçTropes" && cards.length >= 5) {
+    if (isMyTurn && fase === "ReforçTropes" && cards.length >= 5) {
       setMustTrade(true);
-      // Abrir automáticamente el deck si tiene 5+ cartas en ReforçTropes
       if (!isDeckOpen) {
         setIsDeckOpen(true);
       }
-
       toast.error("¡Debes intercambiar cartas! Tienes 5 o más cartas.", {
         duration: 5000,
         position: "top-center",
@@ -98,20 +95,13 @@ export default function TurnManager({
     } else {
       setMustTrade(false);
     }
-  }, [jugador?.id, myId, fase, cards.length, isDeckOpen]);
+  }, [jugador?.id, myId, fase, cards.length, isDeckOpen, isMyTurn]);
 
   const porcentaje = (tiempoRestante / tiempoTotal) * 100;
-  const isSubFase = subFases.includes(fase);
-
-  // Verificar si puede hacer trade (solo en ReforçTropes)
   const canTrade = fase === "ReforçTropes";
 
   const handleNextFase = () => {
-    if (!jugador || jugador.id !== myId) {
-      return;
-    }
-
-    // Si debe hacer trade obligatorio, no permitir avanzar
+    if (!isMyTurn) return;
     if (mustTrade) {
       toast.error(
         "Debes intercambiar cartas antes de continuar. Tienes 5 o más cartas.",
@@ -133,11 +123,7 @@ export default function TurnManager({
   };
 
   const toggleDeck = () => {
-    // Solo permitir al propietario abrir/cerrar el deck
-    if (!jugador || jugador.id !== myId) {
-      return;
-    }
-
+    if (!isMyTurn) return;
     setIsDeckOpen(!isDeckOpen);
     if (isDeckOpen) {
       setSelectedCards([]);
@@ -146,34 +132,21 @@ export default function TurnManager({
   };
 
   const handleCardClick = (card, index) => {
-    // Solo permitir al propietario seleccionar cartas
-    if (!jugador || jugador.id !== myId) {
-      return;
-    }
+    if (!isMyTurn) return;
+    if (selectedCards.length >= 3 && !isCardAlreadySelected(card)) return;
 
-    // Si ya tenemos 3 cartas seleccionadas y esta carta no está seleccionada, no hacer nada
-    if (selectedCards.length >= 3 && !isCardAlreadySelected(card)) {
-      return;
-    }
-
-    // Si la carta ya está seleccionada, la quitamos
     if (isCardAlreadySelected(card)) {
       const newSelectedCards = selectedCards.filter(
         (selectedCard) =>
           !(selectedCard.nom === card.nom && selectedCard.tipus === card.tipus)
       );
       setSelectedCards(newSelectedCards);
-
-      // Si no quedan cartas seleccionadas, cerrar el popup
       if (newSelectedCards.length === 0) {
         setIsTradePopupOpen(false);
       }
     } else {
-      // Agregar la carta a la selección
       const newSelectedCards = [...selectedCards, card];
       setSelectedCards(newSelectedCards);
-
-      // Abrir el popup si no está abierto
       if (!isTradePopupOpen) {
         setIsTradePopupOpen(true);
       }
@@ -188,9 +161,6 @@ export default function TurnManager({
   };
 
   const handleTrade = (tradedCards) => {
-    console.log("Trade executed with cards:", tradedCards);
-
-    // Aquí puedes agregar la lógica para comunicar el intercambio al backend
     if (socket?.socket?.readyState === WebSocket.OPEN) {
       const message = {
         method: "tradeCards",
@@ -211,7 +181,6 @@ export default function TurnManager({
       }
     );
 
-    // Remover las cartas intercambiadas del deck
     const remainingCards = cards.filter(
       (card) =>
         !tradedCards.some(
@@ -224,14 +193,12 @@ export default function TurnManager({
     setSelectedCards([]);
     setIsTradePopupOpen(false);
 
-    // Verificar si aún debe hacer trade después del intercambio
     if (remainingCards.length < 5) {
       setMustTrade(false);
     }
   };
 
   const closeTradePopup = () => {
-    // Si debe hacer trade obligatorio, no permitir cerrar el popup
     if (mustTrade && selectedCards.length < 3) {
       toast.error("Debes seleccionar 3 cartas para intercambiar", {
         duration: 3000,
@@ -239,7 +206,6 @@ export default function TurnManager({
       });
       return;
     }
-
     setIsTradePopupOpen(false);
     setSelectedCards([]);
   };
@@ -250,8 +216,8 @@ export default function TurnManager({
 
   return (
     <>
-      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-[#2c1810]/90 border-[#8b4513] border-2 backdrop-blur-md shadow-lg rounded-xl p-4 w-52 z-60 ">
-        <div className="text-center text-sm font-semibold text-gray-700 uppercase tracking-wide ">
+      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-[#2c1810]/90 border-[#8b4513] border-2 backdrop-blur-md shadow-lg rounded-xl p-4 w-52 z-60">
+        <div className="text-center text-sm font-semibold text-[#d4af37] uppercase tracking-wide">
           {isSubFase ? (
             <div className="flex gap-2 scale-[0.7]">
               {subFases.map((sfase) => {
@@ -291,8 +257,8 @@ export default function TurnManager({
               style={{ borderColor: color }}
             />
             <div className="flex flex-col">
-              <span className="font-medium text-[#d4af37] ">{jugador.nom}</span>
-              <span className="text-sm text-[#f4e4bc]/60 ">
+              <span className="font-medium text-[#d4af37]">{jugador.nom}</span>
+              <span className="text-sm text-[#f4e4bc]/60">
                 Tropas: {tropasDisponibles}
               </span>
             </div>
@@ -303,13 +269,13 @@ export default function TurnManager({
             <div className="flex flex-col items-center gap-1 relative group">
               <button
                 className={`rounded-md transition ${
-                  jugador.id === myId
+                  isMyTurn
                     ? `hover:bg-gray-200 cursor-pointer ${
                         isDeckOpen ? "bg-gray-200" : ""
                       } ${mustTrade ? "animate-pulse bg-red-200" : ""}`
                     : "cursor-not-allowed opacity-60"
                 }`}
-                disabled={!cards?.length || jugador.id !== myId}
+                disabled={!cards?.length || !isMyTurn}
                 onClick={toggleDeck}
               >
                 <svg
@@ -318,7 +284,7 @@ export default function TurnManager({
                   width="30"
                   height="30"
                   className={`transition-all ${
-                    cards?.length > 0 && jugador.id === myId
+                    cards?.length > 0 && isMyTurn
                       ? "grayscale-0"
                       : "grayscale opacity-40"
                   } ${mustTrade ? "drop-shadow-lg" : ""}`}
@@ -340,12 +306,11 @@ export default function TurnManager({
                   mustTrade ? "text-red-400 animate-pulse" : "text-[#f4e4bc]/60"
                 }`}
               >
-                {jugador.id === myId ? cards?.length || 0 : "?"}
+                {isMyTurn ? cards?.length || 0 : "?"}
               </span>
 
-              {/* Tooltip estilo cómic */}
               <div className="absolute bottom-[110%] left-1/2 -translate-x-1/2 px-2 py-1 bg-yellow-100 text-black text-[10px] rounded shadow border border-yellow-300 opacity-0 group-hover:opacity-100 pointer-events-none transition z-10 whitespace-nowrap">
-                {jugador.id !== myId
+                {!isMyTurn
                   ? "Solo el propietario puede ver sus cartas"
                   : mustTrade
                   ? "¡Debes intercambiar cartas!"
@@ -357,7 +322,7 @@ export default function TurnManager({
         </div>
 
         {/* Mensaje de trade obligatorio */}
-        {mustTrade && jugador.id === myId && (
+        {mustTrade && isMyTurn && (
           <div className="mb-2 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 text-center">
             ¡Debes intercambiar cartas!
           </div>
@@ -365,21 +330,25 @@ export default function TurnManager({
 
         {/* Botón de acción */}
         {isSubFase && (
-          <button
+          <motion.button
             onClick={handleNextFase}
-            disabled={mustTrade}
+            disabled={mustTrade || !isMyTurn}
             className={`w-full py-2 border-2 rounded-2xl transition ${
               mustTrade
                 ? "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                : !isMyTurn
+                ? "bg-gray-700 text-gray-400 border-gray-600 cursor-default"
                 : "bg-[#3b2a1a] text-[#d4af37] border-[#8b4513] hover:bg-[#4a2c1a] cursor-pointer"
             }`}
+            whileHover={isMyTurn && !mustTrade ? { scale: 1.02 } : {}}
+            whileTap={isMyTurn && !mustTrade ? { scale: 0.98 } : {}}
           >
             {fase === "Recolocacio" ? "Terminar turno" : "Siguiente"}
-          </button>
+          </motion.button>
         )}
 
         {/* Contador de cartas seleccionadas */}
-        {selectedCards.length > 0 && jugador.id === myId && (
+        {selectedCards.length > 0 && isMyTurn && (
           <div className="mt-2 text-xs text-center text-gray-600">
             Seleccionadas: {selectedCards.length}/3
           </div>
@@ -387,7 +356,7 @@ export default function TurnManager({
       </div>
 
       {/* CardDeck y TradePopup - Solo mostrar si es el propietario */}
-      {jugador.id === myId && (
+      {isMyTurn && (
         <>
           <CardDeck
             cards={cards}
@@ -403,7 +372,7 @@ export default function TurnManager({
             onCardSelect={handleCardSelect}
             onTrade={handleTrade}
             mustTrade={mustTrade}
-            canTrade={canTrade} // Pasar si puede hacer trade
+            canTrade={canTrade}
           />
         </>
       )}
