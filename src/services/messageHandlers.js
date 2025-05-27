@@ -1,7 +1,7 @@
 const messageHandlers = {
   lobby: (data, setPlayers, setGame) => {
     const { jugadors, partida } = data.data || {};
-    // console.log(data);
+    console.log(data);
     if (Array.isArray(jugadors)) {
       setPlayers(jugadors);
     }

@@ -37,7 +37,11 @@ const GameRoom = () => {
   const [currentCard, setCurrentCard] = useState(null);
   const faseRef = useRef(null);
   const [posicioActual, setposicioActual] = useState(null);
-
+  // useEffect(() => {
+  //   if (!location.state?.partida) {
+  //     navigate("/home", { replace: true });
+  //   }
+  // }, [location.state, partida, navigate]);
   // Referencia para el chat
   const addSystemMessageRef = useRef(null);
 
@@ -334,7 +338,7 @@ const GameRoom = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
       <GameBoard>
-        {!allLoaded && (
+        {!allLoaded && !faseActual && (
           <div className="absolute inset-0 z-50 bg-white flex justify-center items-center">
             <LoadingScreen
               gameName={game?.nom}
@@ -356,7 +360,7 @@ const GameRoom = () => {
           svgUpdateTrigger={svgUpdateTrigger}
         />
 
-        {allLoaded && faseActual && jugadorActual && (
+        {faseActual && jugadorActual && (
           <TurnManager
             jugador={jugadorActual}
             tiempoTotal={tiempoTurno}
@@ -367,7 +371,7 @@ const GameRoom = () => {
           />
         )}
 
-        {allLoaded && faseActual && partida?.jugadors && jugadorActual && (
+        {faseActual && partida?.jugadors && jugadorActual && (
           <PlayerSidebar
             jugadores={partida.jugadors}
             posicioActual={posicioActual}

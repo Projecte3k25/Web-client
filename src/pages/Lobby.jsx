@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PlayerList from "../components/PlayerList";
 import LobbyChat from "../components/LobbyChat";
 import Panel from "../components/Panel";
-
+import { toast } from "react-hot-toast";
 import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
 import useWebSocket from "../hooks/useWebSocket";
@@ -23,6 +23,21 @@ const Lobby = () => {
   const isCustomGame = game?.tipus === "Custom";
   const isAdmin = game?.admin_id === profile?.id;
   const shouldShowAdminControls = isCustomGame && isAdmin;
+
+  // 🔒 Redirigir si no hay game
+  useEffect(() => {
+    if (!location.state?.game) {
+      navigate("/home", { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  // 🔒 Redirigir si no hay perfil
+  useEffect(() => {
+    if (!profile) {
+      navigate("/home");
+    }
+  }, [profile, navigate]);
+
   // console.log(game);
   useEffect(() => {
     if (initialPlayers.length === 0) {
@@ -44,7 +59,7 @@ const Lobby = () => {
         }
 
         if (data.method === "startPartida") {
-          // console.log(data.data);
+          console.log(data.data);
           navigate("/game", {
             state: {
               partida: data.data,
@@ -52,6 +67,10 @@ const Lobby = () => {
               players,
             },
           });
+        }
+        if (data.method === "kickJugador") {
+          toast.error("Has estat expulsat de la partida " + game.nom);
+          navigate("/home", { replace: true });
         }
       } catch (err) {
         console.error("Error al parsear mensaje:", err);
@@ -82,6 +101,10 @@ const Lobby = () => {
       navigate("/home");
     }
   }, [profile, navigate]);
+  if (!game) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col justify-between min-h-0.5 p-6 overflow-hidden w-screen ">
       <Sidebar />

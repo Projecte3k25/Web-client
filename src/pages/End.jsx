@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
@@ -9,15 +10,28 @@ const EndGameScreen = () => {
   const ranking = state?.ranking;
   const currentPlayerId = state?.currentPlayerId;
 
-  // Encontrar la posición y datos del jugador actual
-  const currentPlayer = ranking.find(
-    (player) => player.jugador.id === currentPlayerId
-  );
+  const currentPlayer =
+    ranking && currentPlayerId
+      ? ranking.find((player) => player.jugador.id === currentPlayerId)
+      : null;
+
   const currentPosition =
-    ranking.findIndex((player) => player.jugador.id === currentPlayerId) + 1;
+    ranking && currentPlayerId
+      ? ranking.findIndex((player) => player.jugador.id === currentPlayerId) + 1
+      : null;
+
   const handleHome = () => {
     navigate("/home");
   };
+  useEffect(() => {
+    if (!ranking || !currentPlayerId) {
+      navigate("/home", { replace: true });
+    }
+  }, [ranking, currentPlayerId, navigate]);
+
+  if (!ranking || !currentPlayerId) {
+    return null; // Mientras redirige
+  }
   return (
     <Panel>
       <div className="flex h-full gap-6">

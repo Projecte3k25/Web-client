@@ -57,8 +57,7 @@ const AppWrapper = ({ children }) => {
         const sendLogin = () => {
           const message = JSON.stringify({
             method: "login",
-            data: { token },
-            isReconnect,
+            data: { token, isReconnect },
           });
           ws.send(message);
           localStorage.removeItem("freshLogin");

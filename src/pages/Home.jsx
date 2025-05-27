@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import useWebSocket from "../hooks/useWebSocket";
 import GameList from "../components/GameList";
 import Panel from "../components/Panel";
@@ -15,6 +15,9 @@ const Home = () => {
   const [reconnectData, setReconnectData] = useState(null);
   const [showReconnectModal, setShowReconnectModal] = useState(false);
   const [ranking, setRanking] = useState([]);
+  const [game, setGame] = useState();
+  const [players, setPlayers] = useState();
+  const [fronteras, setFronteras] = useState();
 
   // Solicitar datos iniciales cuando el componente se monta
   useEffect(() => {
@@ -37,6 +40,7 @@ const Home = () => {
 
   useEffect(() => {
     const handleMessage = (event) => {
+      // console.log(event);
       try {
         const message = JSON.parse(event.data);
         console.log(message);
@@ -57,9 +61,14 @@ const Home = () => {
           if (Array.isArray(message.data)) {
             setRanking(message.data);
           }
-        } else if (message.type === "reconnect_offer") {
+        } else if (message.method === "reconnect") {
           setReconnectData(message);
           setShowReconnectModal(true);
+          const info = message.data;
+
+          setPlayers(info.jugadors);
+          setGame(info.partida);
+          setFronteras(info.fronteres);
         }
       } catch (err) {
         console.error("Error parsing WS message:", err);
@@ -75,6 +84,28 @@ const Home = () => {
   const handleIgnore = () => {
     setShowReconnectModal(false);
     setReconnectData(null);
+    const leave = JSON.stringify({
+      method: "leavePartida",
+      data: {},
+    });
+    ws.send(leave);
+  };
+  const handleReconnect = () => {
+    const partida = {
+      jugadors: players,
+      territoris: fronteras,
+    };
+    navigate("/game", {
+      state: {
+        partida,
+        game,
+        players,
+      },
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 50);
   };
 
   return (
@@ -92,16 +123,19 @@ const Home = () => {
       </Panel>
 
       {showReconnectModal && reconnectData && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md text-center shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">
+        <div className="fixed inset-0   flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md text-center shadow-lg text-gray-950">
+            <h3 className="text-xl font-semibold mb-4 text-gray-950">
               Vols tornar a la partida?
             </h3>
-            <p className="mb-6">
+            <p className="mb-6 text-gray-950">
               Estaves en una partida activa. Pots tornar ara mateix.
             </p>
             <div className="flex justify-center gap-4">
-              <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              <button
+                className="bg-green-500 text-gray-950 px-4 py-2 rounded hover:bg-green-600"
+                onClick={handleReconnect}
+              >
                 Sí, tornar
               </button>
               <button
