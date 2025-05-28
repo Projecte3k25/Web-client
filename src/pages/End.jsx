@@ -170,7 +170,7 @@ const EndGameScreen = () => {
                       className="w-24 h-24 rounded-full border-4 border-white"
                     />
                     <div>
-                      <h3 className="text-2xl font-bold">
+                      <h3 className="text-2xl font-bold text-gray-800">
                         {currentPlayer.jugador.nom}
                       </h3>
                       <div className="text-lg text-gray-800">
