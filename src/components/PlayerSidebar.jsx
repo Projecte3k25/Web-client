@@ -18,13 +18,12 @@ const PlayerSidebar = ({ jugadores, posicioActual }) => {
   return (
     <>
       <div className="fixed right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-8 p-4 z-40">
-        {/* Contenedor de cuerdas */}
         {jugadores.length > 1 && (
           <div
             className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
             style={{
-              top: "32px", // empieza justo encima del primer avatar
-              height: `${(jugadores.length - 1) * 96}px`, // espacio entre avatares
+              top: "32px",
+              height: `${(jugadores.length - 1) * 96}px`,
               width: "4px",
               transform: "translateX(-50%)",
             }}
@@ -33,7 +32,6 @@ const PlayerSidebar = ({ jugadores, posicioActual }) => {
           </div>
         )}
 
-        {/* Avatares */}
         {jugadores.map((jugador) => {
           const isActual = jugador.posicio === posicioActual;
 

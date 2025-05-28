@@ -45,14 +45,14 @@
 
 .deck-card--opened {
   animation: flipCard 0.8s ease-in-out forwards;
-  /* Mantener la posición final de cardFromDeck */
+
   left: 50% !important;
   top: 35% !important;
 }
 
 .deck-card--removed {
   animation: removeCard 1s ease-in-out forwards;
-  /* Mantener la posición final */
+
   left: 50% !important;
   top: 35% !important;
 }

@@ -30,7 +30,7 @@ const EndGameScreen = () => {
   }, [ranking, currentPlayerId, navigate]);
 
   if (!ranking || !currentPlayerId) {
-    return null; // Mientras redirige
+    return null;
   }
   return (
     <Panel>
@@ -42,7 +42,7 @@ const EndGameScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            Clasificación Final
+            Clasificació Final
           </motion.h2>
 
           <motion.div
@@ -91,8 +91,8 @@ const EndGameScreen = () => {
                         <span
                           className={`font-medium ${
                             isCurrentPlayer
-                              ? "text-white font-bold"
-                              : "text-white"
+                              ? "text-gray-700 font-bold"
+                              : "text-gray-700"
                           }`}
                         >
                           {player.jugador.nom}
@@ -127,7 +127,7 @@ const EndGameScreen = () => {
           </motion.div>
         </div>
 
-        {/* Sección derecha - Estadísticas del jugador actual */}
+        {/* Sección derecha - */}
         <div className="w-2/3 pl-4 flex flex-col overflow-hidden">
           <motion.div
             className="flex-1 flex flex-col items-center justify-center"
@@ -149,11 +149,11 @@ const EndGameScreen = () => {
                         ¡VICTORIA!
                       </span>
                     ) : (
-                      <span>Partida Finalizada</span>
+                      <span>Partida Finalitzada</span>
                     )}
                   </div>
                   <div className="text-xl">
-                    Posición final:{" "}
+                    Posició final:{" "}
                     <span className="font-bold">{currentPosition}º</span>
                   </div>
                 </motion.div>
@@ -173,22 +173,22 @@ const EndGameScreen = () => {
                       <h3 className="text-2xl font-bold">
                         {currentPlayer.jugador.nom}
                       </h3>
-                      <div className="text-lg">
-                        {currentPlayer.jugador.wins} Victorias /{" "}
-                        {currentPlayer.jugador.games} Partidas
+                      <div className="text-lg text-gray-800">
+                        {currentPlayer.jugador.wins} Victories /{" "}
+                        {currentPlayer.jugador.games} Partides
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="bg-white/5 p-4 rounded-lg">
-                      <div className="text-sm text-white/70">Posición</div>
+                      <div className="text-sm text-gray-700/70">Posició</div>
                       <div className="text-3xl font-bold">
                         {currentPosition}º
                       </div>
                     </div>
                     <div className="bg-white/5 p-4 rounded-lg">
-                      <div className="text-sm text-white/70">ELO</div>
+                      <div className="text-sm text-gray-700/70">ELO</div>
                       <div className="text-3xl font-bold">
                         {currentPlayer.jugador.elo}
                         {currentPlayer.eloChange !== 0 && (
@@ -230,7 +230,6 @@ const EndGameScreen = () => {
   );
 };
 
-// Componente Panel (el mismo que proporcionaste)
 const Panel = ({ children }) => {
   return (
     <motion.div

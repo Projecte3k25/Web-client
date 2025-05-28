@@ -46,7 +46,6 @@ const CreateGameModal = ({ onClose }) => {
     setGameType(null);
   };
 
-  // Variantes de animación
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -98,7 +97,6 @@ const CreateGameModal = ({ onClose }) => {
         >
           <AnimatePresence mode="wait">
             {!gameType ? (
-              // Selección de tipo de partida
               <motion.div
                 key="type-selection"
                 initial={{ opacity: 0 }}
@@ -199,7 +197,6 @@ const CreateGameModal = ({ onClose }) => {
                 </motion.div>
               </motion.div>
             ) : (
-              // Formulario para partida personalizada
               <motion.div
                 key="custom-form"
                 initial={{ opacity: 0 }}

@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-// Mapa de colores por posición
 const posicioColors = {
-  1: "#00913f", // verde
-  2: "#2196F3", // azul
-  3: "#FFEB3B", // amarillo
-  4: "#9C27B0", // morado
-  5: "#FF9800", // naranja
-  6: "#c81d11", // rojo
+  1: "#00913f",
+  2: "#2196F3",
+  3: "#FFEB3B",
+  4: "#9C27B0",
+  5: "#FF9800",
+  6: "#008080",
 };
 
 const GameChat = ({ players, ws, onSystemMessage }) => {
@@ -19,9 +18,8 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
   const [userCache, setUserCache] = useState({});
   const hideTimeoutRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const messageCounterRef = useRef(0); // Usar ref para mantener el contador
-  // console.log(players);
-  // Función para generar ID único
+  const messageCounterRef = useRef(0);
+
   const generateUniqueId = () => {
     messageCounterRef.current += 1;
     return `msg_${Date.now()}_${messageCounterRef.current}_${Math.random()
@@ -41,7 +39,7 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     hideTimeoutRef.current = setTimeout(() => setIsVisible(false), 20000);
   };
 
-  // Auto scroll al final de los mensajes
+  // Auto scroll al final de los mensajes mueve toda la pantalla
   //   const scrollToBottom = () => {
   //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   //   };
@@ -74,7 +72,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     }
   };
 
-  // Función para agregar mensaje del sistema
   const addSystemMessage = (message) => {
     const systemMsg = {
       id: generateUniqueId(),
@@ -84,7 +81,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     };
 
     setSystemMessages((prev) => {
-      // Evitar duplicados basados en texto y timestamp reciente
       const isDuplicate = prev.some(
         (msg) =>
           msg.text === systemMsg.text &&
@@ -102,14 +98,12 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     });
   };
 
-  // Exponer función al componente padre de forma segura
   useEffect(() => {
     if (onSystemMessage) {
       onSystemMessage(addSystemMessage);
     }
   }, [onSystemMessage]);
 
-  // Recibir mensajes de chat
   useEffect(() => {
     if (!ws || !ws.onMessage) return;
 
@@ -120,7 +114,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
           showChat();
           const userId = data.data.user;
 
-          // Cachear información del usuario
           if (!userCache[userId]) {
             const playerData = players.find((p) => p.jugador.id === userId);
             if (playerData) {
@@ -134,7 +127,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
             }
           }
 
-          // Agregar mensaje de chat
           const newMessage = {
             id: generateUniqueId(),
             user: userId,
@@ -144,7 +136,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
           };
 
           setMessages((prev) => {
-            // Evitar duplicados de mensajes de chat
             const isDuplicate = prev.some(
               (msg) =>
                 msg.user === newMessage.user &&
@@ -170,7 +161,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
     return () => unsubscribe();
   }, [ws, players, userCache]);
 
-  // Control global de tecla "Enter"
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -258,7 +248,6 @@ const GameChat = ({ players, ws, onSystemMessage }) => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input solo visible en tab de chat */}
         {activeTab === "chat" && (
           <input
             type="text"

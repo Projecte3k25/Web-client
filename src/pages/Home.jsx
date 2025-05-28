@@ -19,17 +19,14 @@ const Home = () => {
   const [players, setPlayers] = useState();
   const [fronteras, setFronteras] = useState();
 
-  // Solicitar datos iniciales cuando el componente se monta
   useEffect(() => {
     if (ws.socket && ws.socket.readyState === WebSocket.OPEN) {
-      // Solicitar ranking
       const rankingMessage = JSON.stringify({
         method: "getRanking",
         data: {},
       });
       ws.send(rankingMessage);
 
-      // Solicitar partidas
       const gamesMessage = JSON.stringify({
         method: "getPartidas",
         data: {},

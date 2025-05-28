@@ -37,49 +37,43 @@ const GameRoom = () => {
   const [currentCard, setCurrentCard] = useState(null);
   const faseRef = useRef(null);
   const [posicioActual, setposicioActual] = useState(null);
-  // useEffect(() => {
-  //   if (!location.state?.partida) {
-  //     navigate("/home", { replace: true });
-  //   }
-  // }, [location.state, partida, navigate]);
-  // Referencia para el chat
-  const addSystemMessageRef = useRef(null);
 
-  // Función para obtener nombre del jugador por ID
+  const addSystemMessageRef = useRef(null);
+  useEffect(() => {
+    if (!state?.partida || !state?.game || !state?.players) {
+      navigate("/home", { replace: true });
+    }
+  }, [state, navigate]);
+  if (!state?.partida || !state?.game || !state?.players) {
+    return null;
+  }
+
   const getPlayerName = (playerId) => {
     if (!playerId) return "Jugador desconocido";
     const player = partida?.jugadors?.find((p) => p.jugador.id === playerId);
     return player?.jugador?.nom || `Jugador ${playerId}`;
   };
 
-  // Función para obtener nombre del territorio
   const getTerritoryName = (territoryId) => {
-    // Aquí deberías tener un mapa de territorios con nombres
-    // Por ahora retornamos el ID
     return territoryId || "Territorio desconocido";
   };
 
-  // Función para generar mensaje del sistema basado en la acción
   const generateSystemMessage = (accion) => {
-    // Usar el jugador actual si no hay posición específica en la acción
-
     const playerName = getPlayerName(accion.jugadorId);
 
     switch (accion.tipo) {
       case "Colocacio":
-        return `${playerName} ha colocado tropas en ${getTerritoryName(
+        return `Se ha colocado tropas en ${getTerritoryName(
           accion.territorio
         )}`;
 
       case "Reforç":
-        return `${playerName} ha reforzado ${getTerritoryName(
-          accion.territorio
-        )}`;
+        return `Se ha reforzado ${getTerritoryName(accion.territorio)}`;
 
       case "ReforçTropes":
-        return `${playerName} ha añadido ${
-          accion.tropas
-        } tropas a ${getTerritoryName(accion.territorio)}`;
+        return `Se ha añadido ${accion.tropas} tropas a ${getTerritoryName(
+          accion.territorio
+        )}`;
 
       case "Atac":
         const fromTerritory = getTerritoryName(accion.from);
@@ -112,7 +106,6 @@ const GameRoom = () => {
             if (prev.includes(msg.data.id)) return prev;
             const newLoaded = [...prev, msg.data.id];
 
-            // Mensaje del sistema cuando se conecta un jugador
             const playerName = getPlayerName(msg.data.id);
             addSystemMessage(`${playerName} se ha conectado a la partida`);
 
@@ -140,9 +133,8 @@ const GameRoom = () => {
           setTiempoTurno(tiempo);
           setTerritorios(territorios);
 
-          // Mensaje del sistema para cambio de fase
           const playerName = getPlayerName(jugadorActual);
-          addSystemMessage(`Fase ${fase}: Es el turno de ${playerName}`);
+          // addSystemMessage(`Fase ${fase}: Es el turno de ${playerName}`);
         }
 
         if (msg.method === "allLoaded") {
@@ -152,7 +144,7 @@ const GameRoom = () => {
           const { tropas, territorios: territoriosACanjear } = msg.data;
           const playerName = getPlayerName(msg.data.jugadorId || jugadorActual);
 
-          const message = `${playerName} ha hecho un canje y ha recibido ${tropas}`;
+          const message = `Se ha hecho un canje y ha recibido ${tropas}`;
 
           addSystemMessage(message);
 
@@ -242,7 +234,6 @@ const GameRoom = () => {
             const isNewAction =
               JSON.stringify(prev) !== JSON.stringify(nuevaAccion);
 
-            // Añadir mensaje del sistema para la nueva acción
             if (isNewAction) {
               const systemMessage = generateSystemMessage(nuevaAccion);
               addSystemMessage(systemMessage);
@@ -252,11 +243,10 @@ const GameRoom = () => {
           });
         }
 
-        // Manejar otros eventos del juego
         if (msg.method === "jugadorEliminado") {
           setFueEliminado(true);
 
-          addSystemMessage(`Jugador ha sido eliminado de la partida`);
+          addSystemMessage(`Un jugador ha sido eliminado de la partida`);
         }
 
         if (msg.method === "partidaTerminada") {
@@ -278,7 +268,6 @@ const GameRoom = () => {
           setCurrentCard(cardFileName);
           setShowCardAnimation(true);
 
-          // Cerrar la animación después de 4 segundos
           setTimeout(() => {
             setShowCardAnimation(false);
             setCurrentCard(null);
@@ -294,21 +283,17 @@ const GameRoom = () => {
     return () => socket.socket?.removeEventListener("message", handleMessage);
   }, [socket, partida, allLoaded]);
 
-  // Función para recibir la referencia del addSystemMessage del chat
   const handleSystemMessageRef = (addSystemMessageFn) => {
     addSystemMessageRef.current = addSystemMessageFn;
   };
 
-  // Queue para manejar mensajes del sistema de forma asíncrona
   const systemMessageQueue = useRef([]);
 
-  // Procesar queue de mensajes del sistema
   useEffect(() => {
     if (systemMessageQueue.current.length > 0 && addSystemMessageRef.current) {
       const messages = [...systemMessageQueue.current];
       systemMessageQueue.current = [];
 
-      // Usar setTimeout para evitar actualizaciones durante el render
       setTimeout(() => {
         messages.forEach((message) => {
           if (addSystemMessageRef.current) {
@@ -319,19 +304,16 @@ const GameRoom = () => {
     }
   }, [systemMessageQueue.current.length]);
 
-  // Prevenir duplicados de mensajes del sistema
   const lastSystemMessageRef = useRef("");
 
-  // Función helper para agregar mensajes del sistema de forma segura
   const addSystemMessage = (message) => {
-    // Evitar duplicados consecutivos
     if (lastSystemMessageRef.current === message) {
       return;
     }
 
     lastSystemMessageRef.current = message;
     systemMessageQueue.current.push(message);
-    // Forzar re-render para procesar la queue
+
     setGameData((prev) => ({ ...prev, _trigger: Date.now() }));
   };
 
@@ -377,7 +359,6 @@ const GameRoom = () => {
             posicioActual={posicioActual}
           />
         )}
-        {/* Chat solo visible cuando la partida está cargada */}
 
         <GameChat
           players={partida.jugadors}
@@ -413,22 +394,6 @@ const GameRoom = () => {
               >
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className="bg-red-500/20 p-2 rounded-full mr-3">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-red-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                    </div>
                     <h2 className="text-2xl font-bold text-white">
                       Has estat eliminat
                     </h2>
@@ -458,7 +423,6 @@ const GameRoom = () => {
                   </div>
                 </div>
 
-                {/* Efecto decorativo */}
                 <div className="h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
               </motion.div>
             </motion.div>

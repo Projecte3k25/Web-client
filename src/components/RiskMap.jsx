@@ -163,7 +163,6 @@ export default function RiskMap({
       text.textContent = "1";
     }
 
-    // Enviar al servidor
     const msg = JSON.stringify({
       method: "accio",
       data: {
@@ -189,14 +188,13 @@ export default function RiskMap({
     const currentColor = pathEl.getAttribute("fill");
     const playerColor = posicioColors[myPosition];
 
-    // Verificar que sea territorio propio
+    // territorio propio
     if (currentColor !== playerColor) return;
 
-    // Obtener elementos del SVG
     const textEl = svg.querySelector(`#${territorioId}_T`);
     const circleEl = svg.querySelector(`#${territorioId}_C`);
 
-    // Leer valor actual y aumentar en 1
+    // +1 al actual
     let currentValue = parseInt(textEl?.textContent || "0", 10);
     currentValue = isNaN(currentValue) ? 1 : currentValue + 1;
 
@@ -206,13 +204,11 @@ export default function RiskMap({
       textEl.style.display = "inline";
     }
 
-    // Mostrar círculo
     if (circleEl) {
       circleEl.style.display = "inline";
       circleEl.setAttribute("fill", "black");
     }
 
-    // Enviar acción al servidor
     const msg = JSON.stringify({
       method: "accio",
       data: {
@@ -238,25 +234,22 @@ export default function RiskMap({
     const currentColor = pathEl.getAttribute("fill");
     const playerColor = posicioColors[myPosition];
 
-    // Verificar que sea territorio propio
     if (currentColor !== playerColor) return;
 
-    // Validar disponibilidad de tropas antes de abrir el modal
+    // tropas dispos para abrir modal
     if (tropasDisponibles <= 0) {
       toast.error("Ya no tienes tropas disponibles.");
       return;
     }
 
-    // Preparar datos para el modal
+    //datos para el modal
     setModalMode("reforc");
     setSelectedTerritorioFrom(territorioId);
     setModalOpen(true);
   };
   const handleConfirmReforcTropes = (tropas) => {
-    // Solo se ejecuta cuando el usuario confirma en el modal
     const territorioId = selectedTerritorioFrom;
 
-    // Enviar acción al servidor
     const msg = JSON.stringify({
       method: "accio",
       data: {
@@ -267,7 +260,6 @@ export default function RiskMap({
 
     socket.send(msg);
 
-    // Actualizar visualmente (opcional, si el servidor no maneja esto completamente)
     const svg = containerRef.current?.querySelector("svg");
     if (svg) {
       const textEl = svg.querySelector(`#${territorioId}_T`);
@@ -303,7 +295,6 @@ export default function RiskMap({
     const territorioData = territorios[territorioId];
     if (!territorioData) return;
 
-    // Si ya hay un territorio seleccionado, y ahora hacen clic en un enemigo vecino
     if (
       selectedTerritorio &&
       fronteras[selectedTerritorio]?.includes(territorioId) &&
@@ -321,7 +312,7 @@ export default function RiskMap({
         selectedTerritorio = null;
         return;
       }
-      // Aquí lanzamos el BattleDiceRoller
+      //  lanzamos el BattleDiceRoller
       setBatallaActiva({
         atacanteId: selectedTerritorio,
         defensorId: territorioId,
@@ -333,7 +324,6 @@ export default function RiskMap({
       return;
     }
 
-    // Si no hay nada seleccionado, y clicas uno tuyo válido
     if (territorioData.posicio === myPosition) {
       selectedTerritorio = territorioId;
 
@@ -373,7 +363,7 @@ export default function RiskMap({
     const territorioData = territorios[territorioId];
     if (!territorioData) return;
 
-    // Si ya hay un territorio seleccionado, y ahora clicas en otro tuyo y hacen frontera
+    //si ya hay un territorio seleccionado, y ahora clicas en otro tuyo y hacen frontera
     if (
       selectedTerritorio &&
       fronteras[selectedTerritorio]?.includes(territorioId) &&
@@ -388,7 +378,7 @@ export default function RiskMap({
         return;
       }
 
-      // Preparamos los datos para el modal
+      //  datos para el modal
       setModalMode("recolocacio");
       setSelectedTerritorioFrom(selectedTerritorio);
       setSelectedTerritorioTo(territorioId);
@@ -398,7 +388,7 @@ export default function RiskMap({
       return;
     }
 
-    // Primer clic en territorio válido propio
+    // clic en territorio válido propio
     if (territorioData.posicio === myPosition) {
       selectedTerritorio = territorioId;
 
@@ -425,11 +415,9 @@ export default function RiskMap({
   };
 
   const handleConfirmRecolocacio = (tropas) => {
-    // Solo se ejecuta cuando el usuario confirma en el modal de recolocación
     const from = selectedTerritorioFrom;
     const to = selectedTerritorioTo;
 
-    // Enviar al servidor
     const msg = JSON.stringify({
       method: "accio",
       data: {
@@ -441,7 +429,6 @@ export default function RiskMap({
 
     socket.send(msg);
 
-    // Actualizar visualmente (opcional si el servidor maneja esto completamente)
     const svg = containerRef.current?.querySelector("svg");
     if (svg) {
       const fromText = svg.querySelector(`#${from}_T`);
@@ -450,11 +437,9 @@ export default function RiskMap({
       const currentFrom = parseInt(fromText?.textContent || "0", 10);
       const currentTo = parseInt(toText?.textContent || "0", 10);
 
-      // Calcular nuevas tropas
       const newFrom = currentFrom - tropas;
       const newTo = currentTo + tropas;
 
-      // Actualizar texto en el SVG
       if (fromText) fromText.textContent = newFrom.toString();
       if (toText) toText.textContent = newTo.toString();
     }
@@ -512,13 +497,12 @@ export default function RiskMap({
 
         const actualizado = { ...prev };
 
-        // Obtener la posicio del jugador que tenía el territorio 'from' (el atacante)
         const atacantePosicio = prev[from].posicio;
 
         if (conquista) {
           actualizado[to] = {
             ...actualizado[to],
-            posicio: atacantePosicio, // el atacante conquista el territorio
+            posicio: atacantePosicio,
             tropas: tropasDefTotal ?? 0,
           };
         } else {
@@ -589,7 +573,7 @@ export default function RiskMap({
       socket.send(message);
     }, 3000);
 
-    return () => clearTimeout(timeout); // limpieza
+    return () => clearTimeout(timeout);
   }, []);
 
   return (

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
 const Ranking = ({ ranking }) => {
-  // Variantes de animación
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -46,7 +45,6 @@ const Ranking = ({ ranking }) => {
     }),
   };
 
-  // Obtener top 3 para el podio
   const topThree = ranking.slice(0, 3);
   const rest = ranking.slice(3);
 
@@ -103,7 +101,7 @@ const Ranking = ({ ranking }) => {
         </motion.div>
       )}
 
-      {/* Lista del resto de participantes */}
+      {/* Resto ranking */}
       <motion.ul
         className="space-y-1"
         variants={containerVariants}

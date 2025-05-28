@@ -10,8 +10,8 @@ const AnimatedCardFromDeck = ({ frontImageUrl }) => {
   useEffect(() => {
     const showTimeout = setTimeout(() => setShowCard(true), 2000);
     const flipTimeout = setTimeout(() => setFlipCard(true), 3000);
-    // Cambiar la imagen exactamente en el punto medio del giro
-    const frontTimeout = setTimeout(() => setShowFront(true), 3400); // 3000 + 400ms (mitad de 800ms)
+
+    const frontTimeout = setTimeout(() => setShowFront(true), 3400);
     const removeTimeout = setTimeout(() => setRemoveCard(true), 5000);
 
     return () => {
@@ -25,7 +25,7 @@ const AnimatedCardFromDeck = ({ frontImageUrl }) => {
   return (
     <div className="deck-container z-100">
       <div className="deck-wrapper">
-        {/* Mazo con volumen mejorado */}
+        {/* Mazo  */}
         <div className="deck-stack">
           {[...Array(8)].map((_, i) => (
             <div
@@ -44,7 +44,7 @@ const AnimatedCardFromDeck = ({ frontImageUrl }) => {
           ))}
         </div>
 
-        {/* Carta animada saliendo del mazo */}
+        {/* Carta saliendo  */}
         {showCard && (
           <div
             className={`deck-card animated-card ${

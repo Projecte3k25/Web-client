@@ -98,22 +98,20 @@ const BattleDiceRoller = ({
     setGifKey(Date.now());
     setShowGif(true);
     setTroopAnimation(true);
-    setShowLosses(false); // ocultamos por si quedó de antes
-    setHasRolled(true); // mostramos dados
+    setShowLosses(false);
+    setHasRolled(true);
 
-    // ✅ MOSTRAR animaciones y resultados
     const timeout = setTimeout(() => {
       setShowGif(false);
       setTroopAnimation(false);
       setShowLosses(true);
 
-      // ✅ OCULTAR resultados y volver a estado inicial luego de 3s más
       setTimeout(() => {
         setShowLosses(false);
         setHasRolled(false);
         setRollResults({ red: [], blue: [] });
       }, 2000);
-    }, 3000); // espera 2s para mostrar pérdidas
+    }, 2500);
 
     return () => clearTimeout(timeout);
   }, [ultimaAccion]);
@@ -123,10 +121,10 @@ const BattleDiceRoller = ({
       const cleanup = setTimeout(() => {
         setShowGif(false);
         setTroopAnimation(false);
-        setShowLosses(false); // 👈 limpiar mensaje
-        setHasRolled(false); // 👈 volver a mostrar placeholders
-        setRollResults({ red: [], blue: [] }); // 👈 opcional
-      }, 7000); // o 3000 si prefieres
+        setShowLosses(false);
+        setHasRolled(false);
+        setRollResults({ red: [], blue: [] });
+      }, 7000);
 
       return () => clearTimeout(cleanup);
     }
@@ -148,7 +146,6 @@ const BattleDiceRoller = ({
           ✕
         </button>
 
-        {/* Sliders */}
         <div className="flex gap-10 w-full justify-center border-b-2 border-[#8b4513] pb-3">
           <div className="flex flex-col items-center ">
             <label className="font-bold text-[#f4e4bc]">
@@ -178,7 +175,6 @@ const BattleDiceRoller = ({
           </div>
         </div>
 
-        {/* Botón de lanzar */}
         {conquistado ? (
           <div className="text-[#d4af37] text-2xl font-bold mt-2">
             ¡Territori conquistat!
@@ -199,7 +195,6 @@ const BattleDiceRoller = ({
           </button>
         )}
 
-        {/* Formación de batalla */}
         <div className="flex items-center justify-center gap-10 mt-4 relative">
           {/* Soldado atacante */}
           <img
@@ -242,7 +237,7 @@ const BattleDiceRoller = ({
             </div>
           )} */}
 
-          {/* Resultado de pérdidas */}
+          {/* Resultado  */}
           {showLosses && (
             <div className="absolute bottom-30 left-1/2 transform -translate-x-1/2 z-50 bg-[#4a2c1a] bg-opacity-80  px-6 py-3 rounded-xl text-xl font-bold shadow-lg border border-[#8b4513]">
               <div className="flex flex-col items-center">

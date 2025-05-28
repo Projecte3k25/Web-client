@@ -56,8 +56,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 </ProtectedRoute>
               }
             />
-
-            <Route path="/test" element={<Test />} />
           </Routes>
         </AppWrapper>
       </BrowserRouter>

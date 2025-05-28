@@ -14,13 +14,13 @@ const AppWrapper = ({ children }) => {
     const backendHost = import.meta.env.VITE_BACKEND_HOST_WS;
     const isLoginRoute = location.pathname === "/";
 
-    // 🔁 Redirigir si ya estaba logueado y viene por recarga
+    //  Redirigir si ya estaba logueado y viene por recarga
     if (isLoginRoute && token) {
       navigate("/home");
       return;
     }
 
-    // 🔌 Si estamos en login, desconectamos el socket
+    //  Si estamos en login, desconectamos el socket
     if (isLoginRoute) {
       if (ws.socket?.readyState === WebSocket.OPEN) {
         ws.socket.close();
@@ -28,25 +28,24 @@ const AppWrapper = ({ children }) => {
       return;
     }
 
-    // ❌ No hacer nada si no hay token
     if (!token) return;
 
-    // 🌐 Añadir graceful_reload para avisar antes de cerrar o recargar
+    //  Añadir graceful_reload para avisar antes de cerrar o recargar
     const handleBeforeUnload = () => {
       if (ws.socket?.readyState === WebSocket.OPEN) {
-        const gameId = localStorage.getItem("currentGameId"); // si tenés una partida activa
+        const gameId = localStorage.getItem("currentGameId");
         ws.send(
           JSON.stringify({
             type: "graceful_reload",
             token,
-            gameId, // opcional: el servidor lo puede usar para guardar tu posición
+            gameId,
           })
         );
       }
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // 🧠 Verificamos si es login o reconexión automática
+    // Verificamos si es login o reconexión automática
     const isFreshLogin = localStorage.getItem("freshLogin") === "true";
     const isReconnect = !isFreshLogin;
 

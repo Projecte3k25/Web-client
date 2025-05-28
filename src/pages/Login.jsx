@@ -57,13 +57,11 @@ const Login = () => {
   };
 
   const handleDiscordClick = () => {
-    // Reemplaza con el enlace de invitación de tu servidor de Discord
     const discordInvite = "https://discord.gg/HBJKArd8";
     window.open(discordInvite, "_blank");
   };
 
   const handlePdfClick = () => {
-    // Reemplaza con la ruta a tu archivo PDF
     const pdfUrl = `http://${backendHost}/assets/documents/Risk-Game.pdf`;
     window.open(pdfUrl, "_blank");
   };
@@ -126,7 +124,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Botones mejorados fuera del login box */}
         <div style={styles.additionalButtons}>
           <button
             type="button"

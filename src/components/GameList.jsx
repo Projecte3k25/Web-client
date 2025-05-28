@@ -12,7 +12,6 @@ const GameList = ({ games = [] }) => {
 
   const socket = useWebSocket();
 
-  // Animaciones
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -136,7 +135,7 @@ const GameList = ({ games = [] }) => {
         </AnimatePresence>
       </motion.ul>
 
-      {/* Modal de contraseña con animación */}
+      {/* Modal de contraseña  */}
       <AnimatePresence>
         {showPasswordModal && (
           <motion.div

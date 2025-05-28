@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import useWebSocket from "../hooks/useWebSocket";
 import messageHandlers from "../services/messageHandlers";
 
-const LobbyChat = ({ players }) => {
+const LobbyChat = ({ players, systemMessages }) => {
   const ws = useWebSocket();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -10,13 +10,18 @@ const LobbyChat = ({ players }) => {
   const [userCache, setUserCache] = useState({});
   const prevPlayersRef = useRef([]);
 
+  useEffect(() => {
+    if (systemMessages?.length > 0) {
+      setMessages((prev) => [...prev, ...systemMessages]);
+    }
+  }, [systemMessages]);
+
   // Detectar entradas y salidas de jugadores
   useEffect(() => {
     const prevPlayers = prevPlayersRef.current;
     const prevIds = new Set(prevPlayers.map((p) => p.id));
     const currentIds = new Set(players.map((p) => p.id));
 
-    // Detectar uniones
     players.forEach((p) => {
       if (!prevIds.has(p.id)) {
         setMessages((prev) => [
@@ -26,7 +31,6 @@ const LobbyChat = ({ players }) => {
       }
     });
 
-    // Detectar salidas
     prevPlayers.forEach((p) => {
       if (!currentIds.has(p.id)) {
         setMessages((prev) => [
@@ -39,7 +43,6 @@ const LobbyChat = ({ players }) => {
     prevPlayersRef.current = players;
   }, [players]);
 
-  // Recibir mensajes
   useEffect(() => {
     const unsubscribe = ws.onMessage((rawData) => {
       try {
@@ -47,7 +50,6 @@ const LobbyChat = ({ players }) => {
         if (data.method === "chat") {
           const userId = data.data.user;
 
-          // Si no está cacheado, lo metemos
           if (!userCache[userId]) {
             const playerData = players.find((p) => p.id === userId);
             if (playerData) {

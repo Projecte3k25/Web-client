@@ -10,7 +10,7 @@
   align-items: flex-start;
   padding-top: 50px;
   z-index: 1000;
-  pointer-events: none; /* Permite clicks a través del overlay */
+  pointer-events: none;
 }
 
 .trade-popup {
@@ -22,7 +22,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   border: 2px solid #8b4513;
   color: #f4e4bc;
-  pointer-events: auto; /* El popup sí recibe clicks */
+  pointer-events: auto;
 }
 
 .trade-popup-header {
@@ -272,7 +272,6 @@
   transform: none;
   box-shadow: none;
 }
-/* Estilos adicionales para agregar a TradePopup.css */
 
 .mandatory-trade-warning {
   background: #dc2626;

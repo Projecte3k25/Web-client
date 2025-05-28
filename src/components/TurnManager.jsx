@@ -103,8 +103,12 @@ export default function TurnManager({
   const porcentaje = (tiempoRestante / tiempoTotal) * 100;
   const canTrade = fase === "ReforçTropes";
 
+  const [isSending, setIsSending] = useState(false);
+
   const handleNextFase = () => {
+    if (isSending) return;
     if (!isMyTurn) return;
+
     if (mustTrade) {
       toast.error(
         "Has d'intercanviar cartes abans de continuar. Tens 5 o més cartes.",
@@ -117,14 +121,19 @@ export default function TurnManager({
     }
 
     if (socket?.socket?.readyState === WebSocket.OPEN) {
+      setIsSending(true);
+
       const message = {
         method: "skipFase",
         data: {},
       };
       socket.socket.send(JSON.stringify(message));
+
+      setTimeout(() => {
+        setIsSending(false);
+      }, 500);
     }
   };
-
   const toggleDeck = () => {
     if (!isMyTurn) return;
     setIsDeckOpen(!isDeckOpen);
@@ -242,7 +251,7 @@ export default function TurnManager({
           )}
         </div>
 
-        {/* Barra de tiempo */}
+        {/*tiempo */}
         <div className="relative w-full h-3 bg-gray-300 rounded-full overflow-hidden mb-2">
           <div
             className="absolute left-0 top-0 h-full transition-all duration-300"
@@ -250,7 +259,6 @@ export default function TurnManager({
           />
         </div>
 
-        {/* Info del jugador */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <img
@@ -267,7 +275,7 @@ export default function TurnManager({
             </div>
           </div>
 
-          {/* Botón de cartas */}
+          {/* cartas */}
           {isSubFase && (
             <div className="flex flex-col items-center gap-1 relative group">
               <button
@@ -324,14 +332,12 @@ export default function TurnManager({
           )}
         </div>
 
-        {/* Mensaje de trade obligatorio */}
         {mustTrade && isMyTurn && (
           <div className="mb-2 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 text-center">
             ¡Has d'intercanviar cartes!
           </div>
         )}
 
-        {/* Botón de acción */}
         {isSubFase && (
           <motion.button
             onClick={handleNextFase}
@@ -350,7 +356,6 @@ export default function TurnManager({
           </motion.button>
         )}
 
-        {/* Contador de cartas seleccionadas */}
         {selectedCards.length > 0 && isMyTurn && (
           <div className="mt-2 text-xs text-center text-gray-600">
             Seleccionades: {selectedCards.length}/3
@@ -358,7 +363,6 @@ export default function TurnManager({
         )}
       </div>
 
-      {/* CardDeck y TradePopup - Solo mostrar si es el propietario */}
       {isMyTurn && (
         <>
           <CardDeck

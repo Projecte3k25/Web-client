@@ -23,15 +23,23 @@ const Lobby = () => {
   const isCustomGame = game?.tipus === "Custom";
   const isAdmin = game?.admin_id === profile?.id;
   const shouldShowAdminControls = isCustomGame && isAdmin;
+  const [systemMessages, setSystemMessages] = useState([]);
 
-  // 🔒 Redirigir si no hay game
+  useEffect(() => {
+    if (players.length === 4 && !isCustomGame) {
+      setSystemMessages((prev) => [
+        ...prev,
+        { system: true, text: "La partida começa en 5s ..." },
+      ]);
+    }
+  }, [players, isCustomGame]);
+
   useEffect(() => {
     if (!location.state?.game) {
       navigate("/home", { replace: true });
     }
   }, [location.state, navigate]);
 
-  // 🔒 Redirigir si no hay perfil
   useEffect(() => {
     if (!profile) {
       navigate("/home");
@@ -50,7 +58,6 @@ const Lobby = () => {
       try {
         const data = JSON.parse(rawData);
 
-        // Procesar mensajes lobby y joinPlayer normalmente
         const validMethods = ["lobby", "joinPlayer"];
         if (validMethods.includes(data.method)) {
           const handler = messageHandlers[data.method];
@@ -141,7 +148,7 @@ const Lobby = () => {
           </div>
 
           <div className="w-1/3 pr-1 pl-1 overflow-y-hidden ">
-            <LobbyChat players={players} />
+            <LobbyChat players={players} systemMessages={systemMessages} />
           </div>
         </div>
       </Panel>

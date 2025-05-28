@@ -1,4 +1,3 @@
-/* CardDeck.css */
 :root {
   --card-width: 7rem;
   --card-animation: slide-down 1s ease-in-out backwards;
@@ -73,7 +72,6 @@
   }
 }
 
-/* Efecto de hover en cascada */
 .card:hover ~ .card {
   transform: rotate(15deg);
 }

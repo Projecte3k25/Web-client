@@ -13,7 +13,7 @@ const DiceRoller = ({
   useEffect(() => {
     if (initialValue == null) return;
     setResult(initialValue);
-    dado(initialValue); // usa el valor pasado
+    dado(initialValue);
   }, [rollingTrigger]);
 
   const dado = (number) => {
@@ -70,7 +70,7 @@ const DiceRoller = ({
     <div id="ui_dado" style={{ "--dice-color": color }}>
       <div id="platform" ref={platformRef}>
         <div id="dice" ref={diceRef} onClick={dado}>
-          {/* Faces */}
+          {/* Caras */}
           <div className="side front">
             <div className="dot center"></div>
           </div>

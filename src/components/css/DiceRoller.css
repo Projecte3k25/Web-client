@@ -128,7 +128,6 @@ body {
   transform: rotateX(-90deg) translateZ(16.5px);
 }
 
-/* Puntos más pequeños y márgenes escalados */
 .dot {
   position: absolute;
   width: 7px;

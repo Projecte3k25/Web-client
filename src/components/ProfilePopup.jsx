@@ -4,7 +4,6 @@ import { useProfile } from "../context/ProfileContext";
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST_API;
 
-// Objeto de colores para evitar interpolación dinámica de clases
 const colorMap = {
   blue: {
     bgFrom: "from-blue-50",
@@ -91,7 +90,6 @@ const ProfilePopup = ({ onClose }) => {
   const winRate =
     profile.games > 0 ? ((profile.wins / profile.games) * 100).toFixed(1) : 0;
 
-  // Variantes de animación
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -130,7 +128,6 @@ const ProfilePopup = ({ onClose }) => {
     }),
   };
 
-  // Componente reutilizable para estadísticas
   const StatCard = ({ value, label, color }) => {
     const colors = colorMap[color] || colorMap.blue;
     return (
@@ -178,7 +175,6 @@ const ProfilePopup = ({ onClose }) => {
           className="bg-white rounded-2xl p-8 w-96 max-w-[95vw] relative shadow-2xl"
           variants={modalVariants}
         >
-          {/* Botón cerrar con animación */}
           <motion.button
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-600 hover:text-red-500 transition-all"
             onClick={onClose}
@@ -201,7 +197,6 @@ const ProfilePopup = ({ onClose }) => {
           </motion.button>
 
           <div className="flex flex-col items-center space-y-6">
-            {/* Avatar con animación */}
             <motion.div
               className="relative group"
               custom={0}
@@ -225,7 +220,6 @@ const ProfilePopup = ({ onClose }) => {
                 )}
               </div>
 
-              {/* Overlay para upload */}
               <motion.div
                 className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                 onClick={triggerFileInput}
@@ -273,7 +267,6 @@ const ProfilePopup = ({ onClose }) => {
               />
             </motion.div>
 
-            {/* Error message con animación */}
             {uploadError && (
               <motion.div
                 className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-200 w-full"
@@ -286,7 +279,6 @@ const ProfilePopup = ({ onClose }) => {
               </motion.div>
             )}
 
-            {/* Nombre del usuario */}
             <motion.div
               className="text-center"
               custom={1}
@@ -300,13 +292,11 @@ const ProfilePopup = ({ onClose }) => {
               </p>
             </motion.div>
 
-            {/* Estadísticas con animación escalonada */}
             <motion.div
               className="w-full space-y-4"
               custom={2}
               variants={contentVariants}
             >
-              {/* Estadísticas principales */}
               <motion.div
                 className="grid grid-cols-2 gap-4"
                 initial="hidden"
@@ -331,7 +321,6 @@ const ProfilePopup = ({ onClose }) => {
                 />
               </motion.div>
 
-              {/* Wins/Losses */}
               <motion.div
                 className="grid grid-cols-2 gap-4"
                 initial="hidden"
@@ -356,7 +345,6 @@ const ProfilePopup = ({ onClose }) => {
                 />
               </motion.div>
 
-              {/* Win Rate */}
               {profile.games > 0 && (
                 <motion.div
                   className="bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg text-center border border-yellow-200"
